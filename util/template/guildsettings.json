@@ -1,0 +1,38 @@
+{
+	"dummy": {
+		"mute_role": "Role ID",
+		"join_logs": "Channel ID",
+		"leave_logs": "Channel ID",
+		"message_logs": "Channel ID",
+		"mod_logs": "Channel ID",
+		"role_permissions": "((WIP))",
+		"prefix": "String",
+		"automod": "Use command automod"
+	},
+	"settings": {
+		"mute_role":"",
+		"join_logs":["",false],
+		"leave_logs":["",false],
+		"message_logs":["",false],
+		"mod_logs":["",false],
+		"role_permissions":{
+			
+		},
+		"prefix":"$",
+		"automod":[]
+	},
+	"commands":{
+		"_admin":{
+			
+		},
+		"_fun":{
+		
+		},
+		"_economy":{
+			
+		},
+		"_mod":{
+		
+		}
+	}
+}

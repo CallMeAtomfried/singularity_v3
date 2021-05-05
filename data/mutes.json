@@ -1,0 +1,9 @@
+{
+	"dummy": {
+		"guildid1": {
+			"userid1": "timestamp",
+			"userid2": "timestamp"
+		}
+	},
+	"guilds": {}
+}

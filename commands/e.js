@@ -3,7 +3,7 @@ module.exports = {
 	name: "e",
 	description: "Return text as emotes",
 	help: "Usage: <pre>e [text]",
-	category: "Utility",
+	category: "Fun",
 	execute(message, args) {
 		var textIn = message.content.substring(message.content.split(" ")[0].length)
 		if(textIn) {

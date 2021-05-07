@@ -3,7 +3,7 @@ module.exports = {
 	name: "xp",
 	description: "View a users or your own XP",
 	help: "Usage: <pre>xp (userping)",
-	category: "Member",
+	category: "Utilities",
 	execute(message, args) {
 		var username = "";
 		var userDiscriminator = "";

@@ -3,7 +3,7 @@ module.exports = {
 	name: "balance",
 	description: "View a users or your own balance",
 	help: "Usage: <pre>balance (userping)",
-	category: "Member",
+	category: "Economy",
 	execute(message, args) {
 		var username = "";
 		var userDiscriminator = "";

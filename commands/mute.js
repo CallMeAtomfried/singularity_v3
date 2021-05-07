@@ -6,7 +6,7 @@ module.exports = {
 	name: "mute",
 	description: "Mute a user",
 	help: "Usage: <pre>mute <Userping> <Time>[d/h/m/s]",
-	category: "Fun",
+	category: "Moderation",
 	execute(message, args, client) {
 		const multiplyers  = {d: 86400000, h: 360000, m: 60000, s: 1000}
 		var mutes = new Mute(message.guild.id);

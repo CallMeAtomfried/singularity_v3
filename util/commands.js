@@ -10,6 +10,7 @@ module.exports = class CommandHandler {
 	}
 	
 	reload() {
+		
 		var categories = this.utilities.getDirectories("./commands");
 		
 		//Load Commands into dictionary

@@ -44,10 +44,6 @@ module.exports = class CommandHandler {
 			message.channel.send({
 			  "embed": {
 				"color": 6365596,
-				"footer": {
-				  "icon_url": "https://cdn.discordapp.com/embed/avatars/0.png",
-				  "text": "footer text"
-				},
 				"author": {
 				  "name": "Here to help.",
 				  "url": "https://discordapp.com",

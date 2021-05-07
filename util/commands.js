@@ -83,7 +83,7 @@ module.exports = class CommandHandler {
 			})
 			
 		} else if(Object.keys(this.commands).includes(subCmd)) {
-			message.channel.send(this.commands[subCmd].help.replace("<pre>", guilds.settings.settings.prefix));
+			message.channel.send(this.commands[subCmd].help.replace(/<pre>/g, guilds.settings.settings.prefix));
 		}
 	}
 

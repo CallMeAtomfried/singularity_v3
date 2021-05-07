@@ -1,6 +1,7 @@
 {
 	"dummy": {
 		"all": "all",
+		"learn": "Boolean",
 		"mute_role": "Role ID",
 		"join_logs": "Channel ID",
 		"leave_logs": "Channel ID",
@@ -11,6 +12,7 @@
 		"automod": "Use command automod"
 	},
 	"settings": {
+		"learn": false,
 		"mute_role":"",
 		"join_logs":["",false],
 		"leave_logs":["",false],

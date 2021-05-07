@@ -4,7 +4,7 @@ const Mute = eval(fs.readFileSync(`./util/mute.js`).toString());
 // const Mute = require("./util/mute.js");
 module.exports = {
 	name: "mute",
-	description: "Mute a user",
+	description: "Mute a user (WIP)",
 	help: "Usage: <pre>mute <Userping> <Time>[d/h/m/s]",
 	category: "Moderation",
 	execute(message, args, client) {

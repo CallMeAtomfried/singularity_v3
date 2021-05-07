@@ -8,7 +8,7 @@ function idToChannel(channelId) {
 module.exports = {
   name: "settings",
   description: "Change the bot settings",
-  help: "Usage: <pre>settings <setting> <value>\n or: <pre>setting help",
+  help: "Usage: <pre>settings <setting> <value>\n or: <pre>settings help",
   category: "Admin",
   execute(message, args, client) {
     // args = message.content.substring(message.content.split(" ")[0].length).trim().split(" ");
@@ -50,6 +50,8 @@ module.exports = {
               } else if(dummy[subkey[y]] == "Channel ID") {
                 settingsNames += (`${subkey[y]}: ${idToChannel(settings[subkey[y]])}\n`)
               } else if(dummy[subkey[y]] == "String"){
+                settingsNames += (`${subkey[y]}: ${settings[subkey[y]]}\n`)
+              } else if(dummy[subkey[y]] == "Boolean"){
                 settingsNames += (`${subkey[y]}: ${settings[subkey[y]]}\n`)
               }
               
@@ -105,9 +107,9 @@ module.exports = {
                 let settings = JSON.parse(fs.readFileSync(`./guilds/${message.guild.id}/settings.json`))
                 settings.settings[args[1]] = args[2].replace(/<@&|>/g, "");
                 fs.writeFile(`./guilds/${message.guild.id}/settings.json`, JSON.stringify(settings), function(){console.log('done')});
-                message.channel.send(`Successfully set ${args[1]} to ${args[2]}!`);
+                message.channel.send(`Successfully set ${args[1]} to ${args[2]}`);
               } else {
-                message.channel.send(`ERROR! You can't set ${args[1]} to ${args[2]}!`);
+                message.channel.send(`ERROR! You can't set ${args[1]} to ${args[2]}`);
               }
               break
               
@@ -134,6 +136,17 @@ module.exports = {
                 message.channel.send(`ERROR! You can't set ${args[1]} to ${args[2]}!`);
               }
               break
+			case "Boolean":
+			  console.log(args[1], args[2])
+              if(args[2]) {
+                let settings = JSON.parse(fs.readFileSync(`./guilds/${message.guild.id}/settings.json`))
+                settings.settings[args[1]] = (args[2].toLowerCase()=="true");
+                fs.writeFile(`./guilds/${message.guild.id}/settings.json`, JSON.stringify(settings), function(){console.log('done')});
+                message.channel.send(`Successfully set ${args[1]} to ${args[2]}!`);
+              } else {
+                message.channel.send(`ERROR! You can't set ${args[1]} to ${args[2]}!`);
+              }
+			  break
             default:
               message.channel.send("Invalid setting :c");
           }

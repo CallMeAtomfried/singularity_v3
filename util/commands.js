@@ -28,21 +28,58 @@ module.exports = class CommandHandler {
 		var subCmd = message.content.split(" ")[1]
 		
 		if(subCmd == undefined) {
-			var helptext = "```";
+			var helptext = {}
 			
-			for(var category in this.categories) {
-				helptext += `${this.categories[category].toUpperCase()}:\n`
-				for(var cmd in this.commands) {
-					if(this.commands[cmd].category == this.categories[category]) {
-						helptext += `   ${this.commands[cmd].name}: ${this.commands[cmd].description}\n`
-					}
+			for(var x in this.commands) {
+				if(helptext[this.commands[x].category] == undefined) {
+					helptext[this.commands[x].category] = ""
 				}
+				helptext[this.commands[x].category] += `**${this.commands[x].name}:** \`${this.commands[x].description}\n\``
+				
 			}
-			helptext += "```"
-			var splithelp = this.utilities.splitter(helptext);
-			for(var split in splithelp) {
-				message.channel.send(splithelp[split])
-			}
+			// for(let x in helptext) {
+				// helptext[x] += "```"
+			// }
+			message.channel.send({
+			  "embed": {
+				"color": 6365596,
+				"footer": {
+				  "icon_url": "https://cdn.discordapp.com/embed/avatars/0.png",
+				  "text": "footer text"
+				},
+				"author": {
+				  "name": "Here to help.",
+				  "url": "https://discordapp.com",
+				  "icon_url": "https://images.discordapp.net/avatars/601089040107831331/f96cfb6a30ba7b0ce8a4272d43c4073b.png?size=1024"
+				},
+				"fields": [
+				  {
+					"name": "👑 Admin",
+					"value": helptext.Admin
+				  },
+				  {
+					"name": "👮 Moderation",
+					"value": helptext.Moderation
+				  },
+				  {
+					"name": "🛠️ Utilities",
+					"value": helptext.Utility
+				  },
+				  {
+					"name": "🎉 Fun",
+					"value": helptext.Fun
+				  },
+				  {
+					"name": "📋 Markov",
+					"value": helptext.Markov
+				  },
+				  {
+					"name": "💰 Economy",
+					"value": helptext.Economy
+				  }
+				]
+			  }
+			})
 			
 		} else if(Object.keys(this.commands).includes(subCmd)) {
 			message.channel.send(this.commands[subCmd].help.replace("<pre>", guilds.settings.settings.prefix));

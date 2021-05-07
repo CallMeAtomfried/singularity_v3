@@ -1,5 +1,6 @@
 {
 	"dummy": {
+		"all": "all",
 		"mute_role": "Role ID",
 		"join_logs": "Channel ID",
 		"leave_logs": "Channel ID",

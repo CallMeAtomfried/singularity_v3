@@ -5,7 +5,6 @@ const config = require("./config.json");
 var mutes = require("./data/mutes.json");
 
 const Mute = require("./util/mute.js");
-console.log(mutes)
 const Command = require("./util/commands.js");
 const Guild = require("./util/guilds.js");
 const Markov = require("./util/markov.js");

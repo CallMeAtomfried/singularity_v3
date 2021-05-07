@@ -39,7 +39,7 @@ function getUsers() {
 
 //Regular execution
 setInterval(function(){tick()}, 1000);
-setInterval(function(){markov.save("./markovdata/messages.json")}),
+setInterval(function(){markov.save("./markovdata/messages.json");console.log("saved")}, 10000)
 
 // commandHandler.commands["ping"].execute();
 
@@ -51,7 +51,7 @@ client.on("ready", () => {
 
 
 client.on("message", (message) => {
-	if(message.author.id == "601089040107831331" && message.content.startsWith("Successfully set prefix to")) {
+	if(message.author.id == "601089040107831331" && message.content.startsWith("Successfully set")) {
 		guilds[message.guild.id].loadSettings();
 	}
 	if(!message.author.bot) {
@@ -77,7 +77,9 @@ client.on("message", (message) => {
 	
 	
 	//Global admin only stuff
-	if(message.author.id==354275704457789451 && message.content.startsWith("--")) {
+	var globalAdmins = ["354275704457789451"]
+	
+	if(globalAdmins.includes(message.author.id) && message.content.startsWith("--")) {
 		globalAdmin(message);
 	}
 	
@@ -95,7 +97,7 @@ client.on("message", (message) => {
 	}
 	
 	//Markov learning
-	if(message.author.id!=601089040107831331 && !config.blacklistguilds.includes(message.guild.id) && !message.content.startsWith("--")) {
+	if(message.author.id!=601089040107831331 && !config.blacklistguilds.includes(message.guild.id) && !message.content.startsWith("--") && guilds[message.guild.id].settings.settings.learn) {
 		markov.learn(message.content, 6);
 		markov.learn(message.content, 5);
 		markov.learn(message.content, 4);
@@ -105,6 +107,8 @@ client.on("message", (message) => {
 		console.log("Learned");
 	}
 });
+
+
 
 function globalAdmin(message) {
 	//Roll out updates to guilds

@@ -8,6 +8,7 @@ module.exports = class Game {
 	checkmarks = ["☑","✅","❌"];
 	currentTurn = 0;
 	score = 0;
+	correctlyPlaced = [false,false,false,false];
 	// mastermindEmotes = ["1","2","3","4","5","6","7"]
 	constructor(player, game, message) {
 		this.playerID = player;
@@ -16,6 +17,7 @@ module.exports = class Game {
 	}
 	//\:red_circle: \:blue_circle:\:brown_circle:\:purple_circle:\:green_circle:\:yellow_circle:\:orange_circle:
 	mastermindStart(message) {
+		console.log("Game start");
 		for(var x in this.masterMindSeq) {
 			var add = this.mastermindEmotes[this.randomInt(0, 7)];
 			this.masterMindSeq[x] = add
@@ -27,7 +29,7 @@ module.exports = class Game {
 	nextMove(message) {
 		if(this.currentTurn<10) {
 			var input = message.content.replace(/ /g,"");
-			console.log("i", input, input.length);
+			
 			var newIn = []
 			var validInput = false;
 			if(input.length == 8) {
@@ -39,7 +41,10 @@ module.exports = class Game {
 				for(var x in newIn) {
 					if(this.masterMindSeq[x] == newIn[x]) {
 						out += this.checkmarks[1];
-						this.score += (10-this.currentTurn)*10;
+						if(!this.correctlyPlaced[x]) {
+							this.score += (10-this.currentTurn)*10;
+							this.correctlyPlaced[x] = true;
+						}
 					} else if(this.masterMindSeq[x] != newIn[x] && this.masterMindSeq.includes(newIn[x])) {
 						out += this.checkmarks[0];
 						this.score += (10-this.currentTurn)*5;
@@ -49,8 +54,14 @@ module.exports = class Game {
 				}
 				this.currentTurn++;
 				message.channel.send(`Turn ${this.currentTurn}: ${out}`);
-				if(out == "☑☑☑☑") message.reply("You're winner! Score: " + this.score);
+				if(out == "✅✅✅✅") {
+					message.reply("You're winner! Score: " + this.score);
+					this.currentTurn = 11;
+				}
+				
 			}
+		} else {
+			message.reply("You lose :c")
 		}
 	}
 	

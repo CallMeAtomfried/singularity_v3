@@ -1,4 +1,9 @@
-### b_0.3 - Current version (07/05/2021)
+### b_0.3.1 - Current version (16/05/2021)
+
+- Mastermind game added
+- Slowly starting to use child processes
+
+### b_0.3 - (07/05/2021)
 
 - First release of the new rewrite, now with commands neatly filed away as node modules instead of being run via eval() on plain text. 
 - Added most commands of the previous versions.

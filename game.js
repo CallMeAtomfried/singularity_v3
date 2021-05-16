@@ -42,7 +42,7 @@ client.on("message", (message) => {
 		mastermindplayers[message.author.id] = [message.channel.id, game, Date.now()]
 	}
 	
-	console.log(mastermindplayers);
+	//console.log(mastermindplayers);
 	if(mastermindplayers[message.author.id]&&!message.content.includes("rules")) {
 		if(mastermindplayers[message.author.id][0] == message.channel.id) {
 			if(mastermindplayers[message.author.id][1].currentTurn < 10) {

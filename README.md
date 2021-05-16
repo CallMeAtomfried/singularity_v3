@@ -1,6 +1,6 @@
 # Singularity Bot
 
-Current version: b_0.3
+Current version: b_0.3.1
 
 The hopefully last rewrite of the bot that went nowhere. Not to be taken seriously this is mainly for me to see whats possible. Of course you can go ahead and host it yourself, all you need is a Discord token.
 Its fully functional in theory, so far it has not been hit with a significant load yet.
@@ -136,6 +136,10 @@ Basically what it does is constantly listen for messages. It adds these messages
 If you dont believe me, the bot comes preloaded with a bit of pretrained text. Go into `/markovdata/messages.js` and see for yourself. With a bit of effort you may be able to read the text, but that quickly changes once you unleash a bunch of users onto the bot. It should thus not violate TOS, there is however the setting `learn`
 By default it is set to false, meaning you need to actively opt in. 
 The larger the dataset the more interesting and longer the results become. 
+
+## Games
+
+Added the mastermind game. 
 
 ## Upcoming features
 

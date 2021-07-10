@@ -1,0 +1,15 @@
+{
+  "name": "singularity_v3-main",
+  "version": "1.0.0",
+  "description": "Current version: b_0.3.1",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^12.5.3"
+  }
+}

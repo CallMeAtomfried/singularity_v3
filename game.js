@@ -1,5 +1,6 @@
 const Discord = require("discord.js");
 const client = new Discord.Client();
+
 const config = require("./config.json");
 const Guild = require("./util/guilds.js");
 var mastermindplayers = {"id": ["channel", "gameobj", "starttime"]}
@@ -18,11 +19,22 @@ function getUsers() {
     });
   }
 }
+setInterval(function(){tick()}, 10000);
 
+function tick() {
+	process.send("heartbeat");
+}
 client.on("ready", () => {
-	console.log("Games started");
-	getUsers();
+	process.send("online");
+	// getUsers();
 	
+});
+
+process.on('message', (m) => {
+  if (m == "shutdown") {
+	  process.send("shutting down");
+	  process.exit();
+  }
 });
 
 client.on("message", (message) => {
@@ -36,7 +48,7 @@ client.on("message", (message) => {
 	}
 	if(message.content == `${guilds[message.guild.id].settings.settings.prefix}mastermind`) {
 		
-		
+		console.log("game");
 		let Game = require("./util/game.js");
 		let game = new Game(message.author.id, 1, message);
 		mastermindplayers[message.author.id] = [message.channel.id, game, Date.now()]

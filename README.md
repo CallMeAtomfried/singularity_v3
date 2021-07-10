@@ -11,10 +11,18 @@ Its fully functional in theory, so far it has not been hit with a significant lo
 - [Discord.js](https://discord.js.org/#/) v12.x or higher
 - A [Discord API token](https://discord.com/developers/applications) and everything that entails
 - A Discord guild, else you won't be able to enjoy the glory that is this bot
+- [ooer-markov](https://www.npmjs.com/package/ooer-markov) module, see below
 - [Ability to read](https://en.wikipedia.org/wiki/Reading_comprehension)
 - (Optional) Willingness to dive into the code for additional customisation
 
+## Installation
 
+With Node installed, navigate to the main bot folder, open your terminal and run 
+```npm install discord.js```
+and 
+```npm install ooer-markov```
+
+This should automatically install the newest version of both. ooer-markov is the npm version of the notmarkov repo, the source code is identical. 
 
 ## Setup
 
@@ -34,7 +42,7 @@ Its fully functional in theory, so far it has not been hit with a significant lo
   "coinsPerMessage":1
 }
 ```
-8. Open your terminal of choice, navigate to the main folder and run `node main.js`
+8. Open your terminal of choice, navigate to the main folder and run `node watchdog.js`
 8. If you get any errors, something went wrong during the installation process.
 8. If you see a message saying "I am ready!" then you're done, congratulations, your bot is live, go buy some candy or w/e.
 8. It still cant join your server on its own. So go back to the developer portal, this time under "Application". Get the "Application ID". 

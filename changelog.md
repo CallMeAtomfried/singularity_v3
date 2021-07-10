@@ -1,4 +1,13 @@
-### b_0.3.1 - Current version (16/05/2021)
+### 0.4.0 - Current version (11/07/2021)
+- Fully implemented watchdog system:
+  - Divided bot in 4 Subprocesses
+  - Added watchdog process
+  - Communication between processes possible
+- Bot restart now possible for bot owners
+- Fixed issues with new discord.js version
+- Markov now using words
+
+### b_0.3.1
 
 - Mastermind game added
 - Slowly starting to use child processes

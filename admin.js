@@ -69,6 +69,8 @@ function globalAdmin(message) {
 		}
 	} else if (message.content == "--reload") {
 		process.send("command reload");
+	} else if (message.content == "--restart") {
+		process.send("restart");
 	}
 }
 function systeminfo() {

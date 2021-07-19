@@ -1,3 +1,4 @@
+
 const fs = require("fs");
 module.exports = class Game {
 	
@@ -12,6 +13,7 @@ module.exports = class Game {
 	// mastermindEmotes = ["1","2","3","4","5","6","7"]
 	constructor(player, game, message) {
 		this.playerID = player;
+		console.log(player);
 		this.gameID = 1;
 		this.mastermindStart(message);
 	}
@@ -27,6 +29,7 @@ module.exports = class Game {
 	
 	
 	nextMove(message) {
+		
 		if(this.currentTurn<10) {
 			// Cleaning up input
 			var input = message.content.replace(/ /g,"");
@@ -61,6 +64,9 @@ module.exports = class Game {
 				message.channel.send(`Turn ${this.currentTurn}: ${out}, score: ${this.score}`);
 				if(out == "✅✅✅✅") {
 					message.reply("You're winner! Score: " + this.score);
+					console.log(this.playerID);
+					process.send({"command":"addbalance", "userid": this.playerID, "amt": this.score})
+					
 					this.currentTurn = 11;
 				}
 				

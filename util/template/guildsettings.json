@@ -9,7 +9,11 @@
 		"mod_logs": "Channel ID",
 		"role_permissions": "((WIP))",
 		"prefix": "String",
-		"automod": "Use command automod"
+		"automod": "Use command automod",
+		"random_chance": "Float",
+		"response_chance": {
+			"Channel ID": "Float"
+		}
 	},
 	"settings": {
 		"learn": false,
@@ -22,7 +26,10 @@
 			
 		},
 		"prefix":"$",
-		"automod":[]
+		"automod":[],
+		"random_chance": 0.3,
+		"response_chance": {
+		}
 	},
 	"commands":{
 		"_admin":{

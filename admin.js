@@ -1,14 +1,15 @@
 // Admin process
-
+process.send({"return": "starting"})
 const Discord = require("discord.js");
 const client = new Discord.Client();
 const config = require("./config.json");
-
+const Guild = require("./util/guilds.js");
+const Update = require("./util/rollout.js");
 setInterval(function(){tick()}, 10000);
 var globalAdmins = ["354275704457789451", "586547885320175629"]
 
 function tick() {
-	process.send("heartbeat");
+	process.send({"return":"heartbeat"});
 }
 
 client.on("message", (message) => {
@@ -19,19 +20,33 @@ client.on("message", (message) => {
 });
 
 client.on("ready", () => {
-	 process.send("online");
+	process.send({"return":"online"});
 });
+
+
+
 process.on('message', (m) => {
-  if (m == "shutdown") {
-	  process.send("shutting down");
-	  process.exit();
-  }
+	switch (m.command) {
+		case "shutdown":
+			process.send({"return":"shutting down"});
+			process.exit();
+			break;
+	}
+
 });
 
 function globalAdmin(message) {
 	//Roll out updates to guilds
 	if(message.content=="--rollout") {
-		let Update = require("./util/rollout.js");
+		var guildIds = client.guilds.cache.map(guild => guild.id);
+		console.log("guild ids:", guildIds);
+		var guilds = {};
+		for (var x in guildIds) {
+			guilds[x] = new Guild(guildIds[x]);
+			guilds[x].loadSettings();
+			console.log(guilds[x].id);
+		}
+		
 		let rollout = new Update(guilds);
 		rollout.rolloutSettings();
 	} else if(message.content.startsWith("--blacklist add")) {
@@ -40,7 +55,7 @@ function globalAdmin(message) {
 			config.blacklistguilds.push(guildToBL);
 			fs.writeFile("config.json", JSON.stringify(config), function(){});
 		}
-		console.log(config.blacklistguilds)
+		// console.log(config.blacklistguilds)
 	} else if(message.content.startsWith("--blacklist remove")) {
 		let guildToBL = message.content.replace("--blacklist remove ","");
 		if(config.blacklistguilds.includes(guildToBL)) {
@@ -68,10 +83,12 @@ function globalAdmin(message) {
 			message.channel.send("Could not evaluate!");
 		}
 	} else if (message.content == "--reload") {
-		process.send("command reload");
+		process.send({"command": "reload"});
 	} else if (message.content == "--restart") {
-		process.send("restart");
-	}
+		process.send({"command": "restart"});
+	} else if (message.content == "--invite") {
+		message.channel.send("https://discord.com/oauth2/authorize?client_id=601089040107831331&scope=bot&permissions=67398656")
+	} 
 }
 function systeminfo() {
 	const os = require("os");

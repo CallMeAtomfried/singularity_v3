@@ -1,3 +1,4 @@
+process.send({"return": "starting"})
 const Discord = require("discord.js");
 const client = new Discord.Client();
 const fs = require("fs")
@@ -8,7 +9,6 @@ const Mute = require("./util/mute.js");
 const Command = require("./util/commands.js");
 const Guild = require("./util/guilds.js");
 const Markov = require("ooer-markov");
-const User = require("./util/user.js");
 
 var guilds = {};
 var commandHandler = new Command();
@@ -26,10 +26,15 @@ function stringify(inputArray) {
 }
 
 process.on('message', (m) => {
-  if (m == "shutdown") {
-	  process.send("shutting down");
-	  process.exit();
-  }
+	switch (m.command) {
+		case "shutdown":
+			process.send({"return":"shutting down"});
+			process.exit();
+			break;
+		case "reload":
+			commandHandler.reload();
+			break;
+	}
 });
 
 if(fs.existsSync("./markovdata/messages.json")&&fs.readFileSync("./markovdata/messages.json").toString()!="") {
@@ -52,27 +57,30 @@ function getUsers() {
   }
 }
 
-
+//
 
 //Regular execution
 setInterval(function(){tick()}, 1000);
-setInterval(function(){markov.save("./markovdata/messages.json");console.log("saved")}, 10000)
+// setInterval(function(){markov.save("./markovdata/messages.json");console.log("saved")}, 10000)
 
 // commandHandler.commands["ping"].execute();
 
 client.on("ready", () => {
 	
-	process.send("online");
+	process.send({"return":"online"});
 	
 	
 });
 
 
 client.on("message", (message) => {
+	var messageGuild = new Guild(message.guild.id);
+	messageGuild.loadSettings();
+	// console.log(messageGuild.settings);
 	if(message.author.id == "601089040107831331" && message.content.startsWith("Successfully set")) {
 		guilds[message.guild.id].loadSettings();
 	}
-	
+	// console.log("Bot:", message.author.bot);
 	if(!message.author.bot) {
 		//check if guild is known
 		if(guilds[message.guild.id]==undefined) {
@@ -80,21 +88,39 @@ client.on("message", (message) => {
 			guilds[message.guild.id].loadSettings();
 		}
 		
-		if(message.content.startsWith(`${guilds[message.guild.id].settings.settings.prefix}help`)) {
+		if(message.content.startsWith(`${messageGuild.settings.settings.prefix}help`)) {
 			commandHandler.help(message, guilds[message.guild.id]);
-		} else if (message.content.startsWith(guilds[message.guild.id].settings.settings.prefix + "reproduce")) {
-			commandHandler.handler(message, guilds[message.guild.id], markov);
+		// } else if (message.content.startsWith(guilds[message.guild.id].settings.settings.prefix + "reproduce")) {
+			// commandHandler.handler(message, guilds[message.guild.id], markov);
+			// process.send({command: "reproduce", text: message.content});
 		
 		} else if(message.content.startsWith(guilds[message.guild.id].settings.settings.prefix)) {
 			commandHandler.handler(message, guilds[message.guild.id], client);
+		} 
+			
+			
+		
+		
+		
+		if (!message.content.startsWith(guilds[message.guild.id].settings.settings.prefix) && !message.content.startsWith("--")) {
+			process.send({"command": "addxp", "user": message.author.id, "amt": 1})
+			process.send({"command": "addmsgstat", "user": message.author.id, guild: message.guild.id})
+			
+			// console.log(messageGuild.settings.settings);
+			var rand = Math.random()
+			// console.log("rand", rand);
+			if (messageGuild.settings.settings.response_chance[message.channel.id] !== undefined) {
+				if (rand < messageGuild.settings.settings.response_chance[message.channel.id] || 0) {
+					process.send({command: "randommessage", text: message.content, channel: message.channel.id})
+				}
+			}
 		}
-		var user = new User(message.author.id);
-		user.updateStatistics(2, 1);
-		user.saveStatistics();
 		
 		
+	
 		
 	}
+	
 	
 	
 	
@@ -119,10 +145,10 @@ client.on("message", (message) => {
 
 
 function tick() {
-	for(guild in mutes.guilds) {
-		console.log(guild)
-	}
-	process.send("heartbeat");
+	// for(guild in mutes.guilds) {
+		// console.log(guild)
+	// }
+	process.send({"return":"heartbeat"});
 }
 
 client.login(config.token);

@@ -14,7 +14,7 @@ module.exports = {
     // args = message.content.substring(message.content.split(" ")[0].length).trim().split(" ");
     
     //Get Message author as MEMBER!
-    var member = client.guilds.find(u => u.id === message.guild.id).members.find(u => u.id === message.author.id);
+    var member = client.guilds.cache.find(u => u.id === message.guild.id).members.cache.find(u => u.id === message.author.id);
     if(member.hasPermission(["ADMINISTRATOR"])) {
       if(args[1] == undefined || args[1] == "help") {
         var settingsTemplate = JSON.parse(fs.readFileSync(`./guilds/${message.guild.id}/settings.json`).toString()).settings;
@@ -53,7 +53,9 @@ module.exports = {
                 settingsNames += (`${subkey[y]}: ${settings[subkey[y]]}\n`)
               } else if(dummy[subkey[y]] == "Boolean"){
                 settingsNames += (`${subkey[y]}: ${settings[subkey[y]]}\n`)
-              }
+              } else if(dummy[subkey[y]] == "Float") {
+				  settingsNames += (`${subkey[y]}: ${settings[subkey[y]]}\n`)
+			  }
               
             }
             message.channel.send({
@@ -124,7 +126,8 @@ module.exports = {
                 message.channel.send(`ERROR! You can't set ${args[1]} to ${args[2]}!`);
               }
               break
-              
+            case "Float": 
+				if (isNaN(parseFloat(args[2]))) break;
             case "String":
               console.log(args[1], args[2])
               if(args[2]) {
@@ -147,6 +150,7 @@ module.exports = {
                 message.channel.send(`ERROR! You can't set ${args[1]} to ${args[2]}!`);
               }
 			  break
+			
             default:
               message.channel.send("Invalid setting :c");
           }

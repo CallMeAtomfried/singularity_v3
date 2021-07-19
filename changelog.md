@@ -1,3 +1,8 @@
+### 0.4.1 - Current version (19.07.2021)
+- Bugfixes
+- Random chance of bot responding to messages
+- Chance settable on a per channel bases
+
 ### 0.4.0 - Current version (11/07/2021)
 - Fully implemented watchdog system:
   - Divided bot in 4 Subprocesses

@@ -4,13 +4,15 @@ var heartbeats = {
 	markov: 0,
 	admin: 0,
 	game: 0,
-	main: 0
+	main: 0,
+	user: 0
 }
 var checkheartbeats = {
 	markov: false,
 	admin: false,
 	game: false,
-	main: false 
+	main: false ,
+	user: false
 }
 
 function tick() {
@@ -38,6 +40,13 @@ function tick() {
 			console.log("Main timeout!");
 		}
 	}
+	if (checkheartbeats.user) {
+		heartbeats.user++;
+		if (heartbeats.user > 30) {
+			console.log("User timeout!");
+			
+		}
+	}
 }
 
 
@@ -49,13 +58,17 @@ var markovprocess;
 var gameprocess;
 var mainprocess;
 var adminprocess;
+var userprocess;
+
 start();
 function start() {
 	markovprocess = {invoked: false, process: child.fork('./bot_markov.js')};
 	gameprocess = {invoked: false, process: child.fork('./game.js')};
 	mainprocess = {invoked: false, process: child.fork('./main.js')};
 	adminprocess = {invoked: false, process: child.fork('./admin.js')};
-
+	userprocess = {invoked: false, process: child.fork('./user.js')};
+	
+	
 	//Markov listeners
 	markovprocess.process.on('error', function(err) {
 		if(markovprocess.invoked) return;
@@ -64,12 +77,13 @@ function start() {
 	});
 
 	markovprocess.process.on('message', function (message) {
-		console.log("markov:", message);
-		switch(message) {
+		if (message.return != "heartbeat") console.log("markov:".padEnd(10), message);
+		switch(message.return) {
 			case "heartbeat": 
 				heartbeats.markov = 0;
 				break
 			case "online":
+				// console.log("markov:", message);
 				checkheartbeats.markov = true;
 				break;
 		}
@@ -90,18 +104,25 @@ function start() {
 	});
 
 	adminprocess.process.on('message', function (message) {
-		console.log("admin:", message);
-		switch(message) {
+		if (message.return != "heartbeat") console.log("admin:".padEnd(10), message);
+		switch(message.command) {
+			case "restart":
+				restart();
+				break;
+			case "reload":
+				mainprocess.process.send({"command": "reload"});
+				break;
+		}
+		
+		switch(message.return) {
 			case "heartbeat": 
 				heartbeats.admin = 0;
 				break
 			case "online":
 				checkheartbeats.admin = true;
 				break;
-			case "restart":
-				restart();
-				break;
 		}
+		
 	});
 	adminprocess.process.on('exit', function (code) {
 		if (adminprocess.invoked) return;
@@ -121,8 +142,15 @@ function start() {
 		callback(err);
 	});
 	gameprocess.process.on('message', function (message) {
-		console.log("game:", message);
-		switch(message) {
+		if (message.return != "heartbeat") console.log("game:".padEnd(10), message);
+		switch(message.command) {
+			case "addbalance":
+			case "addxp":
+			case "addmsgstat":
+				userprocess.process.send(message);
+				break
+		}
+		switch(message.return) {
 			case "heartbeat": 
 				heartbeats.game = 0;
 				break
@@ -145,45 +173,114 @@ function start() {
 		callback(err);
 	});
 	mainprocess.process.on('message', function (message) {
-		console.log("main:", message);
-		switch(message) {
+		if (message.return != "heartbeat") console.log("main:".padEnd(10), message);
+		switch(message.command) {	
+			case "addbalance":
+			case "setbalance":
+			case "getbalance":
+			case "addxp":
+			case "setxp":
+			case "getxp":
+			case "addmsgstat":
+			case "givemoney":
+				userprocess.process.send(message);
+				break
+				
+			case "mute":
+				// send to mute process
+				break;
+			case "reproduce":
+			case "randommessage":
+			case "coinword":
+				markovprocess.process.send(message);
+		}
+		
+		switch(message.return) {
 			case "heartbeat": 
 				heartbeats.main = 0;
 				break
+				
 			case "online":
+				// console.log("main:", message);
 				checkheartbeats.main = true;
 				break;
 		}
+		
+		
 	});
 	mainprocess.process.on('exit', function (code) {
 		if (mainprocess.invoked) return;
-		invoked = true;
+		mainprocess.invoked = true;
+		var err = code === 0 ? null : new Error('exit code ' + code);
+		callback(err);
+	});
+
+
+
+	//Game listeners 
+
+	userprocess.process.on('error', function(err) {
+		if(userprocess.invoked) return;
+		userprocess.invoked = true;
+		callback(err);
+	});
+	
+	userprocess.process.on('message', function (message) {
+		if (message.return != "heartbeat") console.log("user:".padEnd(10), message);
+		// console.log("user:", message);
+		switch(message.return) {
+			case "heartbeat": 
+				heartbeats.user = 0;
+				break
+			case "online":
+				// console.log("user:", message);
+				checkheartbeats.user = true;
+				break;
+		}
+		
+		
+	});
+	userprocess.process.on('exit', function (code) {
+		if (userprocess.invoked) return;
+		userprocess.invoked = true;
 		var err = code === 0 ? null : new Error('exit code ' + code);
 		callback(err);
 	});
 }
 
+
+
 function restart() {
 	
-	markovprocess.process.send("shutdown");
-	gameprocess.process.send("shutdown");
-	mainprocess.process.send("shutdown");
-	adminprocess.process.send("shutdown");
+	markovprocess.process.send({"command":"shutdown"});
+	gameprocess.process.send({"command":"shutdown"});
+	mainprocess.process.send({"command":"shutdown"});
+	adminprocess.process.send({"command":"shutdown"});
+	userprocess.process.send({"command":"shutdown"});
+	 
 	heartbeats = {
 		markov: 0,
 		admin: 0,
 		game: 0,
-		main: 0
+		main: 0,
+		user: 0
 	}
 	checkheartbeats = {
 		markov: false,
 		admin: false,
 		game: false,
-		main: false 
+		main: false,
+		uesr: true
 	}
-	start();
+	setTimeout(function(){start()}, 2000);
 	
 }
+
+function killUser() {
+	userprocess.process.send({"command":"shutdown"});
+	userprocess = {invoked: false, process: child.fork('./user.js')};
+}
+
 
 
 // runScript('./bot_markov.js', function (err) {

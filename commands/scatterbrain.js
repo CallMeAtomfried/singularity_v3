@@ -8,7 +8,7 @@ module.exports = {
 	help: "Usage: <pre>scatterbrain",
 	category: "Markov",
 	execute(message, args) {
-		var msgs = message.channel.messages.array();
+		var msgs = message.channel.messages.cache.array();
 		var collectedMessages = "";
 		for(var x = 500; x > 0; x--) {
 			if(msgs[msgs.length-x]) collectedMessages += `${msgs[msgs.length-x]}\n`

@@ -9,9 +9,10 @@ module.exports = {
 		var textOut = "Error!"
 		var textIn = message.content.substring(message.content.split(" ")[0].length);
 		if(!textIn) {
-			var msgs = message.channel.messages.array();
+			var msgs = message.channel.messages.cache.array();
 			var msg = msgs[msgs.length-2]
-			if(msg) {
+			console.log(msg.content);
+			if(msg.content) {
 				gib.learn(msg.content, 1);
 				message.channel.send(gib.reproduce(Math.floor(Math.random()*200), 1));
 				gib.reset();

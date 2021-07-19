@@ -1,44 +1,50 @@
-const fs = require("fs");
-const Mute = eval(fs.readFileSync(`./util/mute.js`).toString());
-
-// const Mute = require("./util/mute.js");
 module.exports = {
 	name: "mute",
-	description: "Mute a user (WIP)",
-	help: "Usage: <pre>mute <Userping> <Time>[d/h/m/s]",
+	description: "Mutes a user",
+	help: "Usage: <pre>mute <Userping> (Time)\nTime is optional and uses the suffixes m, h and d",
 	category: "Moderation",
-	execute(message, args, client) {
-		const multiplyers  = {d: 86400000, h: 360000, m: 60000, s: 1000}
-		var mutes = new Mute(message.guild.id);
-		var settings = JSON.parse(fs.readFileSync(`./guilds/${message.guild.id}/settings.json`).toString());
+	execute(message, args) {
 		
-		//Get Message author as MEMBER!
-		var member = client.guilds.find(u => u.id === message.guild.id).members.find(u => u.id === message.author.id);
-		
-		// Check if mute role is set
-		if(settings.settings.mute_role=="") {
-			message.reply("No mute role set. Ask the admin");
-			
-		// Check if message author has mute permission
-		} else if(!member.hasPermission(["MUTE_MEMBERS"])) {
-			message.reply("You do not have permission to do that!")
-			
+		var requester=message.author;
+		var user;
+		if (args[1].match(/<@[0-9]{18}>|<@![0-9]{18}>/g)) {
+			user = args[1].replace(/<@|!|>/g, "");
 		} else {
-			// Get the target as MEMBER!
-			var target = client.guilds.find(u => u.id === message.guild.id).members.find(u => u.id === message.mentions.users.first().id);
-			
-			if(target.roles.has(settings.settings.mute_role)) {
-				//User already muted
-			} else {
-				//Mute user and set end time in mute module, save afterwards
+			message.channel.send("No user provided!")
+			return;
+		}
+		
+		var timeInt = Infinity;
+		
+		if (args[2]) {
+			timeInt = parseInt(args[2]);
+			var timeFac = args[2].replace(timeInt.toString(), "");
+			switch (timeFac) {
+			case "d":
+				timeInt *= 86400000;
+				break;
+			case "h":
+				timeInt *= 360000;
+				break;
+			case "m":
+				timeInt *= 60000;
+				break;
+			case "s":
+			case "":
+				timeInt *= 1000;
+				break;
+			default:
+				message.channel.send("Invalid time!")
+				return;
 			}
 			
 		}
 		
+		var muteEnd = Date.now() + timeInt;
 		
+		process.send({"mute": {"user": user, "timeEnd": muteEnd, "channel": message.channel}})
 		
-		
-		//forEach(guild => console.log(guild.members.find(u => u.id === '354275704457789451').user, "\n///////////////////////////////////////////"));
 		
 	}
+	
 }

@@ -1,3 +1,4 @@
+process.send({"return": "starting"})
 const Discord = require("discord.js");
 const client = new Discord.Client();
 
@@ -22,20 +23,26 @@ function getUsers() {
 setInterval(function(){tick()}, 10000);
 
 function tick() {
-	process.send("heartbeat");
+	process.send({"return":"heartbeat"});
 }
 client.on("ready", () => {
-	process.send("online");
+	process.send({"return":"online"});
 	// getUsers();
 	
 });
 
 process.on('message', (m) => {
-  if (m == "shutdown") {
-	  process.send("shutting down");
-	  process.exit();
-  }
+  switch (m.command) {
+		case "shutdown":
+			process.send({"return":"shutting down"});
+			process.exit();
+			break;
+	}
 });
+
+function deleteGame(game) {
+	mastermindplayers[message.author.id] = null;
+}
 
 client.on("message", (message) => {
 	if(message.author.id == "601089040107831331" && message.content.startsWith("Successfully set")) {
@@ -48,10 +55,11 @@ client.on("message", (message) => {
 	}
 	if(message.content == `${guilds[message.guild.id].settings.settings.prefix}mastermind`) {
 		
-		console.log("game");
+		// console.log("game");
 		let Game = require("./util/game.js");
 		let game = new Game(message.author.id, 1, message);
 		mastermindplayers[message.author.id] = [message.channel.id, game, Date.now()]
+		setTimeout(deleteGame, 600000, message.channel.id);
 	}
 	
 	//console.log(mastermindplayers);

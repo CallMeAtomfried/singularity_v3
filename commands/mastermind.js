@@ -1,5 +1,5 @@
 module.exports = {
-	name: "avatar",
+	name: "mastermind",
 	description: "Start a game of mastermind against the bot",
 	help: "Usage: <pre>mastermind (rules)",
 	category: "Fun",

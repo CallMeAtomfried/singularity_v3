@@ -1,6 +1,6 @@
 # Singularity Bot
 
-Current version: 0.4.0
+Current version: 0.4.1
 
 The hopefully last rewrite of the bot that went nowhere. Not to be taken seriously this is mainly for me to see whats possible. Of course you can go ahead and host it yourself, all you need is a Discord token.
 Its fully functional in theory, so far it has not been hit with a significant load yet.

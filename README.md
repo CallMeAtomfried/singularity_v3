@@ -71,6 +71,13 @@ Change the bots guild specific setting. Most of them don't do anything yet. In f
 
 Now, you might have heard that Discord is rolling out the slash commands, but... no. Simple as that. You can set the prefix to whatever you want, but make sure it does not have a space in it. In fact, you cant. Just doesnt work and thats intentional. In short, it renders the bot useless for the guild.
 
+Syntax: 
+Change Settings `settings set <setting> <value>`
+View Settings `settings get <setting|all>`
+          or  `settings help`
+          or  `settings`
+(`settings get all` and the latter two commands list every setting avaibable)
+
 Examples: 
 ```
 $settings prefix >
@@ -81,13 +88,14 @@ $settings prefix >
 ```
 > A list of all available settings and their value. Get only specific values by replacing "all" with the setting name.
 ```
->setting remove mute_role
+>setting reset mute_role
 ```
 > Removes the role the bot assigns to muted users. This will "deactivate" the mute command. "settings remove" can be run with everything but prefix, you may be able to imagine why.
 
 ### MODERATION COMMANDS
 
-(nothing, yet.)
+#### Mute
+(Work in progress, no longer works after the rewrite, has simply been copied over from the previous version. ETA TBD)
 
 ### UTILITY COMMANDS
 
@@ -100,13 +108,16 @@ Returns the time it takes for the bot to respond.
 #### XP
 View your own or someone elses XP and level. 
 
+Syntax: `$xp`
+    or  `$xp <userping>`
+
 ### FUN COMMANDS
 #### Avatar
 
 Returns you a larger version of the profile picture of either a user you mention or yourself.
 
 #### E
-Converts a text to the emote letters.
+Converts a text to the emote letters aka the Regional Indicator characters
 
 #### Say
 Just makes the bot say something.
@@ -124,13 +135,16 @@ $gibberish a big brown fox jumps off the cliff.
 > the ox fox ox big the clig ff.
 
 #### Reproduce
-Reproduces more or less coherent text. More on that in the markov section.
+Reproduce is comparable to simply pinging the bot, you can however define a "seed" for the markov generation, like the beginning of a sentence which it will then continue.
 
 #### Scatterbrain
 
-Takes no argument. It looks at the past 500 messages, learns their contents and starts generating a quick burst of philosophical wisdom.
+Takes no argument. It looks at the cached messages for a given channel and uses those to generate new text.
 
 ### ECONOMY
+
+#### Give
+"Transfer" AtomCoin to another user. You can only transfer at most 75% of your total balance.
 
 #### Balance
 Show your or someone elses accounts balance in Atom Coins, the best currency there is. You earn Atom Coin by being active, they are not guild specific.
@@ -139,11 +153,15 @@ Show your or someone elses accounts balance in Atom Coins, the best currency the
 ## Markov
 
 In the previous section I mentioned markov. If you know what it is, ok. If you dont, google is your friend.
-I wrote a Node Module for markov based text generation, it's probably not the usual approach, but it works decently fast. You can find it [here](https://github.com/CallMeAtomfried/markov.js), it even works on its own.
+I wrote a Node Module for markov based text generation, it's probably not the usual approach, but it works decently fast*. You can find it [here](https://github.com/CallMeAtomfried/markov.js), it even works on its own.
 Basically what it does is constantly listen for messages. It adds these messages to a database. The messages are fully anonymised and the process which converts the message text into data that the module can use is non-reversible, meaning once there is a bunch of data in the database, it would be near impossible to reverse engineer more than a few words with absolute certainty.
 If you dont believe me, the bot comes preloaded with a bit of pretrained text. Go into `/markovdata/messages.js` and see for yourself. With a bit of effort you may be able to read the text, but that quickly changes once you unleash a bunch of users onto the bot. It should thus not violate TOS, there is however the setting `learn`
 By default it is set to false, meaning you need to actively opt in. 
 The larger the dataset the more interesting and longer the results become. 
+
+* Testing and timing came up with a speed of roughly 50,000 tokens per second on an AMD Ryzen 7 4700U and 4166MHz RAM, times on an i5 9400F were faster.
+  One token is either one word (A string of characters separated by spaces, eg "xnopyt") or one character, depending on whether or not its a word or letter based model.
+  
 
 ## Games
 
@@ -151,23 +169,24 @@ Added the mastermind game.
 
 ## Upcoming features
 
-- Moderation tools: mute, kick, ban, tempban, tickets <High priority> E.T.A. version b_0.3.1
-- Economy: Inventory, Shops, Transferring money, betting <medium priority> E.T.A. version b_0.3.2
-- Fun: daily weekly and monthly guesses. <low priority> E.T.A. version b_0.3.3
-- detailed logs for all kinds of shenanigans you might want to have. <low-ish priority> E.T.A. b_0.4
+- Moderation tools: mute, kick, ban, tempban, tickets <High priority> E.T.A. version 0.5
+- Economy: Inventory, Shops, Transferring money, betting <medium priority> E.T.A. version 0.6
+- Fun: daily weekly and monthly guesses. <low priority> E.T.A. unknown
+- detailed logs for all kinds of shenanigans you might want to have. <low-ish priority> E.T.A. unknown
 
-- Splitting the bot into multiple processes. Right now only I/O is handled separately.
 - Easier customisation E.T.A. b_0.4
 - Update notifier E.T.A. probably never
 
 ## Advanced users
 
-Welcome to the shadowlands. To use this stuff, you have to - and definietly should - go into the source code of the `main.js`. I advise notepad++.
-In line 80, theres an array containing one long number. Replace that number you see there with your own user id. IT MUST BE YOUR OWN! You can also add more, separated with commas, but do not forget this: each user whose ID is listed in this has full control over your bot far beyond just changing the prefix.
+Welcome to the shadowlands. To use this stuff, you have to - and definietly should - go into the source code of the `admin.js`. I advise notepad++.
+In line 9, theres an array called globalAdmins. Replace that number you see there with your own user id. IT MUST BE YOUR OWN! You can also add more, separated with commas, but do not forget this: each user whose ID is listed in this has full control over your bot far beyond just changing the prefix.
 Sadly, you kinda have to. Else `--rollout` doesnt work. If you dont plan on updating the bot via "official" releases, you dont have to. Maybe consider removing ME from the list, or dont, dont really care. It is perfectly possible to add new commands without ever touching the settings.
 Why?
 Well, most superadmin commands are pretty harmless. 
 - `--rollout` simply applies all changes to the guildsettings template to the individual guild setting files. Preexisting settings are not touched.
 - `--blacklist` is a command with which you can prevent guilds from writing to the global markov model regardless of their setting. Simply do `--blacklist [add|remove] [guild_id]`
 - `--systeminfo` gives you broad info about the current condition of the system, CPU speeds, RAM usage. 
-- `--eval` This is where the danger lies.`--eval` allows you to run any node compatible javascript code directly in chat. This feature exists for debugging or more detailed analysis. In the wrong hands however it can do actual damage. Best case scenario if someone with malicious intent gets access to the bot is they just shut it down. In theory however, it is even possible to change the code. Everything you can make node do in 1995 characters is possible with this. Yes, it is a security risk, but it is manageable. Make sure you only add your own accounts and enable 2FA on all of them. 
+- `--restart` restarts the bot
+- `--reload reloads the commands, useful if you want to make changes to the code without downtime. It reads the commands from disk so it wont be instant, but it should not be noticable on a modern drive.` 
+- `--eval` This is where the danger lies.`--eval` allows you to run any node compatible javascript code directly in chat. This feature exists for debugging or more detailed analysis. In the wrong hands however it can do actual damage. Best case scenario if someone with malicious intent gets access to the bot is they just shut it down. In theory however, it is even possible to change the code. Everything you can make node do in 1993 characters is possible with this. Yes, it is a security risk, but it is manageable. Make sure you only add your own accounts and enable 2FA on all of them. 

@@ -1,5 +1,5 @@
 // Admin process
-process.send({"return": "starting"})
+process.send({target: "watchdog", action: "return","return": "starting"})
 const Discord = require("discord.js");
 const client = new Discord.Client();
 const config = require("./config.json");
@@ -9,28 +9,29 @@ setInterval(function(){tick()}, 10000);
 var globalAdmins = ["354275704457789451", "586547885320175629"]
 
 function tick() {
-	process.send({"return":"heartbeat"});
+	process.send({target: "watchdog", action: "heartbeat"});
 }
 
 client.on("message", (message) => {
 	if(globalAdmins.includes(message.author.id) && message.content.startsWith("--")) {
-		
 		globalAdmin(message);
 	}
 });
 
 client.on("ready", () => {
-	process.send({"return":"online"});
+	process.send({target: "watchdog", action: "return", "return":"online"});
 });
 
 
 
 process.on('message', (m) => {
-	switch (m.command) {
-		case "shutdown":
-			process.send({"return":"shutting down"});
-			process.exit();
-			break;
+	if (m.action == "command") {
+		switch (m.command) {
+			case "shutdown":
+				process.send({target: "watchdog", action: "return", "return":"shutting down"});
+				process.exit();
+				break;
+		}
 	}
 
 });
@@ -83,9 +84,9 @@ function globalAdmin(message) {
 			message.channel.send("Could not evaluate!");
 		}
 	} else if (message.content == "--reload") {
-		process.send({"command": "reload"});
+		process.send({target: "main", action: "command", "command": "reload"});
 	} else if (message.content == "--restart") {
-		process.send({"command": "restart"});
+		process.send({target: "watchdog", action: "command", "command": "restart"});
 	} else if (message.content == "--invite") {
 		message.channel.send("https://discord.com/oauth2/authorize?client_id=601089040107831331&scope=bot&permissions=67398656")
 	} 

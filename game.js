@@ -1,4 +1,4 @@
-process.send({"return": "starting"})
+process.send({target: "watchdog", action: "return", "return": "starting"})
 const Discord = require("discord.js");
 const client = new Discord.Client();
 
@@ -23,20 +23,24 @@ function getUsers() {
 setInterval(function(){tick()}, 10000);
 
 function tick() {
-	process.send({"return":"heartbeat"});
+	process.send({target: "watchdog", action: "heartbeat"});
 }
 client.on("ready", () => {
-	process.send({"return":"online"});
+	process.send({target: "watchdog", action: "return", "return":"online"});
 	// getUsers();
 	
 });
 
 process.on('message', (m) => {
-  switch (m.command) {
+	if (m.action == "command") {
+		switch (m.command) {
 		case "shutdown":
-			process.send({"return":"shutting down"});
+			process.send({target: "watchdog", action: "return", "return":"shutting down"});
 			process.exit();
 			break;
+		case "retrieve":
+			break
+		}
 	}
 });
 
@@ -45,34 +49,51 @@ function deleteGame(game) {
 }
 
 client.on("message", (message) => {
-	if(message.author.id == "601089040107831331" && message.content.startsWith("Successfully set")) {
-		guilds[message.guild.id].loadSettings();
+	var check = "";
+	if (message.channel.type == "dm") {
+		check = "$mastermind";
+	} else {
+		check = `${guilds[message.guild.id].settings.settings.prefix}mastermind`
 	}
-	
-	if(guilds[message.guild.id]==undefined) {
-			guilds[message.guild.id] = new Guild(message.guild.id);
-			guilds[message.guild.id].loadSettings();
-	}
-	if(message.content == `${guilds[message.guild.id].settings.settings.prefix}mastermind`) {
+		
+		
+	if(message.content == check) {
 		
 		// console.log("game");
 		let Game = require("./util/game.js");
-		let game = new Game(message.author.id, 1, message);
-		mastermindplayers[message.author.id] = [message.channel.id, game, Date.now()]
-		setTimeout(deleteGame, 600000, message.channel.id);
+		if (message.channel.type == "dm") {
+			let game = new Game(message.author.id, 1, message);
+			mastermindplayers[message.author.id] = [message.author.id, game, Date.now()]
+			setTimeout(deleteGame, 600000, message.author.id);
+		} else {
+			let game = new Game(message.author.id, 1, message);
+			mastermindplayers[message.author.id] = [message.channel.id, game, Date.now()]
+			setTimeout(deleteGame(message.author.id), 600000, message.channel.id);
+		}
 	}
 	
-	//console.log(mastermindplayers);
+	
 	if(mastermindplayers[message.author.id]&&!message.content.includes("rules")) {
-		if(mastermindplayers[message.author.id][0] == message.channel.id) {
+		
+		if (message.channel.type == "dm") {
+			var channel = message.author.id;
+		} else {
+			var channel = message.channel.id
+		}
+		
+		if(mastermindplayers[message.author.id][0] == channel) {
+			
 			if(mastermindplayers[message.author.id][1].currentTurn < 10) {
+				
 				mastermindplayers[message.author.id][1].nextMove(message);
 			} else {
+				deleteGame(message.author.id)
 				delete mastermindplayers[message.author.id];
 				
 			}
 		}
 	}
+	
 })
 
 

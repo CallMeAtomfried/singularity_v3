@@ -12,8 +12,11 @@ module.exports = {
 				seeds[i-1] = args[i]
 			}
 		}
-		process.send({"command":"coinword","array":seeds, "channel": message.channel.id});
-		
+		if (message.channel.type == "dm") {
+			process.send({target: "markov", action: "command", "command":"coinword", data: {"array":seeds, "channel": message.author.id, dm: true}});
+		} else {
+			process.send({target: "markov", action: "command", "command":"coinword", data: {"array":seeds, "channel": message.channel.id}});
+		}
 	}
 	
 }

@@ -1,4 +1,4 @@
-process.send({"return": "starting"})
+process.send({target: "watchdog", action: "return","return": "starting"})
 const Discord = require("discord.js");
 const client = new Discord.Client();
 const fs = require("fs")
@@ -26,14 +26,16 @@ function stringify(inputArray) {
 }
 
 process.on('message', (m) => {
-	switch (m.command) {
-		case "shutdown":
-			process.send({"return":"shutting down"});
-			process.exit();
-			break;
-		case "reload":
-			commandHandler.reload();
-			break;
+	if (m.action == "command") {
+		switch (m.command) {
+			case "shutdown":
+				process.send({target: "watchdog", action: "return", "return":"shutting down"});
+				process.exit();
+				break;
+			case "reload":
+				commandHandler.reload();
+				break;
+		}
 	}
 });
 
@@ -67,60 +69,93 @@ setInterval(function(){tick()}, 1000);
 
 client.on("ready", () => {
 	
-	process.send({"return":"online"});
+	process.send({target: "watchdog", action: "return", "return":"online"});
 	
 	
 });
 
 
 client.on("message", (message) => {
-	var messageGuild = new Guild(message.guild.id);
-	messageGuild.loadSettings();
-	// console.log(messageGuild.settings);
-	if(message.author.id == "601089040107831331" && message.content.startsWith("Successfully set")) {
-		guilds[message.guild.id].loadSettings();
-	}
-	// console.log("Bot:", message.author.bot);
-	if(!message.author.bot) {
-		//check if guild is known
-		if(guilds[message.guild.id]==undefined) {
-			guilds[message.guild.id] = new Guild(message.guild.id);
+	
+	if (message.channel.type === "dm") {
+		if (message.content.startsWith("$help")) {
+				commandHandler.help(message, {settings: {settings: {prefix: "$"}}});
+		} else if (message.content.startsWith("$") && !message.content.startsWith("$help")) {
+			commandHandler.handler(message, {settings: {settings: {prefix: "$"}}}, client);
+		}
+	} else {
+		
+		var messageGuild = new Guild(message.guild.id);
+		messageGuild.loadSettings();
+		// console.log(messageGuild.settings);
+		if(message.author.id == "601089040107831331" && message.content.startsWith("Successfully set")) {
 			guilds[message.guild.id].loadSettings();
 		}
-		
-		if(message.content.startsWith(`${messageGuild.settings.settings.prefix}help`)) {
-			commandHandler.help(message, guilds[message.guild.id]);
-		// } else if (message.content.startsWith(guilds[message.guild.id].settings.settings.prefix + "reproduce")) {
-			// commandHandler.handler(message, guilds[message.guild.id], markov);
-			// process.send({command: "reproduce", text: message.content});
-		
-		} else if(message.content.startsWith(guilds[message.guild.id].settings.settings.prefix)) {
-			commandHandler.handler(message, guilds[message.guild.id], client);
-		} 
+		// console.log("Bot:", message.author.bot);
+		if(!message.author.bot) {
+			//check if guild is known
+			if(guilds[message.guild.id]==undefined) {
+				guilds[message.guild.id] = new Guild(message.guild.id);
+				guilds[message.guild.id].loadSettings();
+			}
+			
+			if(message.content.startsWith(`${messageGuild.settings.settings.prefix}help`)) {
+				commandHandler.help(message, guilds[message.guild.id]);
+			// } else if (message.content.startsWith(guilds[message.guild.id].settings.settings.prefix + "reproduce")) {
+				// commandHandler.handler(message, guilds[message.guild.id], markov);
+				// process.send({command: "reproduce", text: message.content});
+			
+			} else if(message.content.startsWith(guilds[message.guild.id].settings.settings.prefix)) {
+				commandHandler.handler(message, guilds[message.guild.id], client);
+			} 
+				
+				
 			
 			
-		
-		
-		
-		if (!message.content.startsWith(guilds[message.guild.id].settings.settings.prefix) && !message.content.startsWith("--")) {
-			process.send({"command": "addxp", "user": message.author.id, "amt": 1})
-			process.send({"command": "addmsgstat", "user": message.author.id, guild: message.guild.id})
 			
-			// console.log(messageGuild.settings.settings);
-			var rand = Math.random()
-			// console.log("rand", rand);
-			if (messageGuild.settings.settings.response_chance[message.channel.id] !== undefined) {
-				if (rand < messageGuild.settings.settings.response_chance[message.channel.id] || 0) {
-					process.send({command: "randommessage", text: message.content, channel: message.channel.id})
+			if (!message.content.startsWith(messageGuild.settings.settings.prefix) && !message.content.startsWith("--")) {
+				process.send({
+					target: "user", 
+					action: "command", 
+					"command": "addxp", 
+					data: {
+						"user": message.author.id, 
+						"amt": 1
+					}
+				})
+				process.send({
+					target: "user", 
+					action: "command", 
+					"command": "addmsgstat", 
+					data: {
+						"user": message.author.id, 
+						guild: message.guild.id
+					}
+				})
+				
+				// console.log(messageGuild.settings.settings);
+				var rand = Math.random()
+				// console.log("rand", rand);
+				if (messageGuild.settings.settings.response_chance[message.channel.id] !== undefined) {
+					if (rand < messageGuild.settings.settings.response_chance[message.channel.id] || 0) {
+						process.send({
+							target: "markov", 
+							action: "command", 
+							command: "randommessage", 
+							data: {
+								text: message.content,
+								channel: message.channel.id
+							}
+						})
+					}
 				}
 			}
+			
+			
+		
+			
 		}
-		
-		
-	
-		
 	}
-	
 	
 	
 	
@@ -148,7 +183,7 @@ function tick() {
 	// for(guild in mutes.guilds) {
 		// console.log(guild)
 	// }
-	process.send({"return":"heartbeat"});
+	process.send({target: "watchdog", action: "heartbeat"});
 }
 
 client.login(config.token);

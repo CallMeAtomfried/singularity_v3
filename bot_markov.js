@@ -1,5 +1,5 @@
 // Markov process
-process.send({"return": "starting"})
+process.send({target: "watchdog", action: "return", "return": "starting"})
 const Markov = require("ooer-markov");
 const Discord = require("discord.js");
 const client = new Discord.Client();
@@ -28,60 +28,102 @@ function stringify(inputArray) {
 
 function tick() {
 	markov.save("./markovdata/words.json");
-	process.send({"return":"heartbeat"});
+	process.send({target: "watchdog", action: "heartbeat"});
 }
 
-function coin(arr, channel) {
+function coin(m) {
 	var out = "";
-	for (var w in arr) {
-		if(arr[w] == "\n") arr[w] = null;
+	for (var w in m.data.array) {
+		if(m.data.array[w] == "\n") m.data.array[w] = null;
 		var add = "";
-		while(englishWords.includes(add) || add.length < 3 || add == arr[w]) {
-			add = (coinword.reproduce(100, 3, arr[w], "\n").replace(/\n/g, ""))
+		while(englishWords.includes(add) || add.length < 3 || add == m.data.array[w]) {
+			add = (coinword.reproduce(100, 3, m.data.array[w], "\n").replace(/\n/g, ""))
 		}
 		out += add
 		out += " "
 	}
-	client.channels.cache.get(channel).send(out);
+	if (m.data.dm) {
+		client.users.cache.get(m.data.channel).send(out);
+	} else {
+		client.channels.cache.get(m.data.channel).send(out);
+	}
+}
+
+function userdm(message) {
+	var chance = message.content.split(" ").length / 10;
+	var rand = Math.random();
+	
+	if (rand < chance) {
+		var wordarray = message.content.split(" ");
+		var randWord = wordarray[Math.floor(Math.random() * wordarray.length)];
+		client.users.cache.get(message.author.id).send(stringify(markov.reproduce(Math.floor(Math.random() * 500), 2, randWord)));
+	} else {
+		client.users.cache.get(message.author.id).send(stringify(markov.reproduce(Math.floor(Math.random() * 500), 2)));
+	}
+	
+	
 }
 
 
 client.on("message", (message) => {
-	if (message.mentions.has(client.user)) {
-		message.channel.send(stringify(markov.reproduce(Math.floor(Math.random() * 500), 2)));
+	if (message.channel.type === "dm") {
+		if (!message.content.startsWith("$")) {
+			if (message.author != "601089040107831331" && message.author != 601089040107831331) {
+				// message.channel.send(stringify(markov.reproduce(Math.floor(Math.random() * 500), 2)));
+				userdm(message);
+			}
+		}
+	} else {
+		var guild = new Guild(message.guild.id);
+		guild.loadSettings();
+		if (message.mentions.has(client.user)) {
+			message.channel.send(stringify(markov.reproduce(Math.floor(Math.random() * 500), 2)));
+		}
+		
+		if (guild.settings.settings.learn && message.author.id != client.user.id && !message.content.startsWith(guild.settings.settings.prefix) && !message.content.startsWith("--")) {
+			// markov.learn(message.content.split(" "), 3);
+			markov.learn(message.content.split(" "), 2);
+			markov.learn(message.content.split(" "), 1);
+			process.send({target: "watchdog", action: "return", "return": "learned"});
+		}
 	}
-	// markov.learn(message.content.split(" "), 3);
-	markov.learn(message.content.split(" "), 2);
-	markov.learn(message.content.split(" "), 1);
 });
 
 client.on("ready", () => {
-	 process.send({"return":"online"});
+	 process.send({target: "watchdog", action: "return", "return":"online"});
 });
 
 process.on('message', (m) => {
-	
-	switch (m.command) {
-		case "shutdown":
-			process.send({"return":"shutting down"});
-			process.exit();
-			break;
-		case "coinword":
-			coin(m.array, m.channel);
-			break;
-		case "reproduce":
-			var guild = new Guild(m.guild);
-			guild.loadSettings();
-			reptext = m.text.substring((`${guild.settings.settings.prefix}reproduce`).trim().length) || null
-			client.channels.cache.get(m.channel).send(stringify(markov.reproduce(Math.floor(Math.random() * 500), 2, reptext)));
-			break;
-		case "randommessage":
-			var wordarray = m.text.split(" ");
-			// console.log("array", wordarray);
-			var randWord = wordarray[Math.floor(Math.random() * wordarray.length)];
-			// console.log("randword:", randWord);
-			client.channels.cache.get(m.channel).send(stringify(markov.reproduce(Math.floor(Math.random() * 500), 2, randWord)));
-			break
+	if (m.action == "command") {
+		switch (m.command) {
+			case "shutdown":
+				process.send({target: "watchdog", action: "return", "return":"shutting down"});
+				process.exit();
+				break;
+			case "coinword":
+				coin(m);
+				break;
+			case "reproduce":
+				if (m.data.dm) { 
+					client.users.cache.get(m.data.channel).send(stringify(markov.reproduce(Math.floor(Math.random() * 500), 2, m.data.text.substring(10))));
+				} else {
+					var guild = new Guild(m.guild);
+					guild.loadSettings();
+					reptext = m.data.text.substring((`${guild.settings.settings.prefix}reproduce`).trim().length) || null
+					client.channels.cache.get(m.data.channel).send(stringify(markov.reproduce(Math.floor(Math.random() * 500), 2, reptext)));
+				}
+				break;
+			case "randommessage":
+				var wordarray = m.data.text.split(" ");
+				// console.log("array", wordarray);
+				var randWord = wordarray[Math.floor(Math.random() * wordarray.length)];
+				// console.log("randword:", randWord);
+				client.channels.cache.get(m.data.channel).send(stringify(markov.reproduce(Math.floor(Math.random() * 500), 2, randWord)));
+				break
+			case "userdm":
+				userdm(m);
+				break
+		}
 	}
   
 });

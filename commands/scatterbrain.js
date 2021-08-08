@@ -15,7 +15,7 @@ module.exports = {
 			
 		}
 		markov.learn(collectedMessages, 4)
-		message.channel.send(markov.reproduce(Math.floor(Math.random()*400),4))
+		message.channel.send("**" + markov.reproduce(Math.floor(Math.random()*400),4).toUpperCase() + "**")
 		markov.reset();
 	}
 	

@@ -1,3 +1,12 @@
+### 0.4.2 - Current version (09.08.2021)
+- Bugfixes
+- Renamed "Reproduce" to "generate"
+- Bot now interactable via DMs (you still need to share a server with the bot AND have DMs enabled for at least one of these servers)
+	- The bot will not learn from DM messages for
+	- Some functionality is disabled in DMs for a number of reasons
+	- The bot will always respond to DMs and turning it off is not possible. If you dont want it to respond, using it via DMs is not obligatory.
+	- DM responses use a new way of determining how to respond. Instead of ALWAYS using a random word from the message as seed, the chance of the bot doing so increases with longer messages, at 10 words or more it will always use a random word.
+
 ### 0.4.1 - Current version (19.07.2021)
 - Bugfixes
 - Random chance of bot responding to messages

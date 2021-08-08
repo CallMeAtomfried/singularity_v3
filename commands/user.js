@@ -5,8 +5,13 @@ module.exports = {
 	help: "Usage: <pre>user (userping) (stat) (value)",
 	category: "Admin",
 	execute(message, args) {
+		
 		//message.guild.members.cache.get(message.author.id).hasPermission('ADMINISTRATOR')
 		if(globalAdmins.includes(message.author.id)) {
+			if (message.channel.type == "dm") {
+				message.channel.send("Just use the testing server")
+				return;
+			}
 			if (args.length == 4) {
 				if (args[1].match(/^(<@!?)?[0-9]{18}>?$/g) && !isNaN(parseFloat(args[3]))) {
 					args[1] = args[1].replace(/^(<@!?)?|>?$/g, "");
@@ -15,10 +20,26 @@ module.exports = {
 						arg[1] = args[1].replace(/<@!?|>/g, "");
 						switch (args[2]) {
 							case "xp":
-								process.send({"command": "setxp", "user": args[1], "amount": parseInt(args[3])});
+								process.send({
+									target: "user",
+									action: "command", 
+									data: {
+										"command": "setxp", 
+										"user": args[1], 
+										"amount": parseInt(args[3])
+									}
+								});
 								break;
 							case "balance":
-								process.send({"command": "setbalance", "user": args[1], "amount": args[3]});
+								process.send({
+									target: "user",
+									action: "command", 
+									"command": "setbalance", 
+									data: {
+										"user": args[1],
+										"amount": args[3]
+									}
+								});
 								break;
 						}
 						

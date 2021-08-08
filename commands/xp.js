@@ -22,20 +22,50 @@ module.exports = {
 			userAvatar = message.author.avatar;
 			userID = message.author.id;
 		}
-		let messageData = {
-			"command": "getxp",
-			"channel": message.channel.id,
-			"target": {
-				"username": username,
-				"discriminator": userDiscriminator,
-				"avatar": userAvatar,
-				"id": userID,
-			},
-			"requester": {
-				"id": message.author.id,
-				"username": message.author.username,
-				"discriminator": message.author.discriminator,
-				"avatar": message.author.avatar
+		var messageData = {}
+		
+		if (message.channel.type == "dm") {
+			let messageData = {
+				target: "user",
+				action: "command",
+				"command": "getxp",
+				data: {
+					"channel": message.author.id,
+					"target": {
+						"username": username,
+						"discriminator": userDiscriminator,
+						"avatar": userAvatar,
+						"id": userID,
+					},
+					"requester": {
+						"id": message.author.id,
+						"username": message.author.username,
+						"discriminator": message.author.discriminator,
+						"avatar": message.author.avatar
+					},
+					dm: true
+				}
+			}
+		} else {
+			let messageData = {
+				target: "user",
+				action: "command",
+				"command": "getxp",
+				data: {
+					"channel": message.channel.id,
+					"target": {
+						"username": username,
+						"discriminator": userDiscriminator,
+						"avatar": userAvatar,
+						"id": userID,
+					},
+					"requester": {
+						"id": message.author.id,
+						"username": message.author.username,
+						"discriminator": message.author.discriminator,
+						"avatar": message.author.avatar
+					}
+				}
 			}
 		}
 		process.send(messageData)

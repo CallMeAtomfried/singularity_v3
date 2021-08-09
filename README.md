@@ -62,97 +62,156 @@ From time to time, new settings are added to the bot. There is a file in the `/u
 
 Settings do not require a restart of the bot, you as the bot owner need to run the command `--rollout`, however. Only you can do that. More on that in the Advanced users section
 
+
 ## Commands
-### ADMIN COMMANDS
+
+All syntax examples use the default prefix of *$* - obviously it will be whatever you set it to.
+### Admin commands
+
 #### Settings
+Users with Administrator permissions can change the guilds settings. These settings are:
+- mute_role
+  - The role which is assigned to users that are muted. Not setting this role causes mutes to simply be disabled. (Mutes aren't available yet anyway)
+- join_logs
+  - The channel where the bot logs joining users. Not setting this causes the bot to not log any joining users. (Logs in general aren't implemented either)
+- leave_logs
+  - Same as join_logs but, you guessed it, it will log the players that left as well as their roles and their strikes and warns, once those are implemented
+- message_logs
+  - Message edits and deletions will be logged in this channel
+- mod_logs
+  - Moderation activity will be logged here in searcheable form for easy access later down the line
+- prefix
+  - The prefix determines what the bot will listen to when determining when a command has been sent. Change this setting if the default value of *$* could cause issues with other bots in your guild. The prefix must not contain spaces but otherwise can have any arbitrary length less than 2000, but remember: if you want people to be able to use the bot, maybe consider picking something short and easily typable.
+- automod
+  - This will hold all the words you want the bot to automatically delete. This will also trigger a mod_logs entry, so consider if that is maybe worth it. Eventually, you will be able to sort words into different groups of severity: DELETE, WARN and STRIKE, causing the bot to take the according action. The automod command itself will be unaffected by the auto moderation, so you dont get any strikes yourself for changing the settings.
+- learn
+  - Guild-wide setting. Set it to true if you want the bot to read the messages and learn the speech pattern for later reproduction. Doing so is equivalent to agreeing, that the bot may do so. Messages are not saved and only the message contents are exposed to the markov module which you can find [here](https://github.com/CallMeAtomfried/markov.js). A more detailed explaination of its inner workings can also be found in that repository. 
 
-Requires the user to have Admin permissions.
-Change the bots guild specific setting. Most of them don't do anything yet. In fact, the only one that has a use as of now is prefix, with which you can change the command prefix.
+To get the current value of a setting, do `$settings get <setting name>`. `$settings get all` returns all settings and their values.
+To set a setting, do `$settings set <setting name> <value>`
 
-Now, you might have heard that Discord is rolling out the slash commands, but... no. Simple as that. You can set the prefix to whatever you want, but make sure it does not have a space in it. In fact, you cant. Just doesnt work and thats intentional. In short, it renders the bot useless for the guild.
+Some settings have their own commands for better usability. These are:
+- response_chance
+  - Defines the chance of the bot responding to a message in a channel on a per channel basis
+- role_permissions
+  - Will be implemented once the bot has enough functionality to warrant more granular control over who can do what. Administrators will not be affected.
 
-Examples: 
-```
-$settings prefix >
-```
-> Sucessfully set prefix to >
-```
->settings get all
-```
-> A list of all available settings and their value. Get only specific values by replacing "all" with the setting name.
-```
->setting remove mute_role
-```
-> Removes the role the bot assigns to muted users. This will "deactivate" the mute command. "settings remove" can be run with everything but prefix, you may be able to imagine why.
 
-### MODERATION COMMANDS
 
-(nothing, yet.)
+#### Response
 
-### UTILITY COMMANDS
+The aforementioned command to set the chances to respond to a message on a per channel basis.
 
-#### Help
-Do `$help` for a general overview. If you want further details, do `$help <command name>`
+Usage: `$response <Channel Mention> <value>`
+Where Channel Mention is simply the name of the Channel with a # in front of it, discord should automatically convert it into the right format, and the value is a floating point number between 0.0 and 1.0 inclusive. This will be the chance of the bot responding, meaning on average for every 100 messages it will respond to chance * 100 of them. For example, if the chance is set to 0.2, it will respond to 20 out of 100 (or 1 out of 5) messages, on average. Note that it will not respond to every fifth message in this case. It is still random. It might respond to several messages in a row, it might not respond for an entire day, thats just randomness. Exceptions are of course 0.0, where it will not respond at all, and 1.0, where it will respond every time. 
+
+#### User
+
+The `$user` command is reserved for bot owners. It allows direct modification of a users balance or XP, but i kindly ask to only do that in "emergencies". If you want to reward players money as a bot owner (meaning you host the bot with your own token), you can also use the `$give` command, which is the preferred option.
+
+### Moderation commands
+
+#### Mute
+
+The only command to exist in theory, it is however unfinished and thus disabled. Dont worry about it, there are plenty more bots that you can use temporarily until I find the motivation to do so. You are, however, free to write the mute stuff yourself or even contribute. More info in the contribute section.
+
+Future moderation functionality will include warns, strikes, kicks, bans and tickets. 
+Warns are less "bad" than strikes, although how you deal out these things is up to you. You will be able to set a number of warns required for an automatic strike as well as the number of strikes required for an automatic kick and / or ban. 
+
+Tickets will function as a sort of modmail for users to notify the moderation team of your Guild with complaints, requests, suggestions or reports. The format will probably be up to you, as well as the punishment for abuse.
+
+### Utilities
 
 #### Ping
-Returns the time it takes for the bot to respond.
+Simply measures the bots latency
 
 #### XP
-View your own or someone elses XP and level. 
+View your own or somebody else's XP and level. The current level is calculated mathematically, meaning theres no upper bound on XP, but the downside is that i cannot tell you when you will receive the next level. ![The formula used to calculate the level](https://github.com/CallMeAtomfried/singularity_v3/blob/main/images/levels.png)
 
-### FUN COMMANDS
+Currently, there is no working spam protection, meaning users could just spam and get XP for it, meaning message XP is currently disabled. 
+
+To get your own XP, simply run `$xp`. If you want to see another users XP, do `$xp <userping>`. 
+
+### Fun commands
+
 #### Avatar
 
-Returns you a larger version of the profile picture of either a user you mention or yourself.
+Return the avatar of any arbitrary user in your guild as a full format embedded image. 
+`$avatar` for your own avatar, `$avatar <userping>` to get that users picture.
 
 #### E
-Converts a text to the emote letters.
+
+Short for "Emoji", it takes a text and returns it as "big text" using the *regional_indicator* emotes. Kinda like yelling, but in blue.
+
+Usage: `$e <Text>`
 
 #### Say
-Just makes the bot say something.
 
-#### Daily
-Guess the correct number between 0 and 100 and win 500 Atomcoin. Only possible every 24 hours.
+Simply makes the bot say something. Kinda pointless, but can maybe be used for memes or whatever, i don't know. It mostly exists because it was the first thing I ever added to see if the bot was working as intended.
 
-#### Weekly
-Guess the correct number between 0 and 100 and win 5000 Atomcoin. Only possible every 7 days.
+#### Daily, Weekly and Monthly
 
-#### Daily
-Guess the correct number between 0 and 100 and win 50000 Atomcoin. Only possible every 30 days.
+Guess the correct number between 0 and 100 inclusive and win 500, 5000 or 50000 Atomcoin respectively. Accordingly, you can only guess once every 24 hours, 7 days or 30 days depending on which command you run, however the individual guesses do not influence each other. 
 
+Usage:
 
-### MARKOV COMMANDS
+`$daily <number>`, `$weekly <number>`, `$monthly <number>`
+
+#### Games
+
+Or game, rather. So far, I only wrote one game, an implementation of the famous 1972 Game of the Year winning board game "Mastermind" using the rules I know. The aim of the game is to decipher the computers secret code. You start the game using `$mastermind`, it will ask you to make a guess. Make your first guess by sending 4 and exactly 4 of the colored circle emotes, nothing else except spaces. The bot will evaluate your guess and return clues. It will tell you which colors you placed in the correct spot and it will tell you which colors are in the wrong spot. Your goal is to try to guess the sequence in as few turns as possible. You receive points for every correct guess - you get more points the earlier you made that guess - and starting from turn 2, you will lose points for every color you guessed that is not in the code - the later in the game, the more points you lose. If you win, you will get additional points according to how quickly you finished. The score is translated 1 to 1 into AtomCoin, which is kinda only for showing off, as of now.
+
+### Markov commands
+
+#### Coinword
+
+This command will use a pre-trained markov model to generate an english looking word that usually doesn't exist. If you give it nothing to go off of, it will simply generate something random. You can however give it any number of character sequences to start with (up to 20), separated by spaces, and it will generate a word for each one of them starting with the seed you gave it.
+
+Usage: `$coinword [seeds]`, example: `$coinword a b c d` returns `amalisheelist biddener cently ded`. Note that it is random and that was just an example. Also, for some reason it does sometimes send actual existing words, that should in theory just not happen and im unsure how that is a thing, but if it happens, simply run it again. 
+
+#### Generate
+
+Formerly known as Reproduce, this command returns a markov generated sentence. Similar to coinword, you can give it something to go off of, but note that this is word based markov, unlike the letter based markov that coinword uses, meaning keymashing, typos that are bad enough or simply phrases that the bot has never seen may sometimes generate nothing new. It is a learning based method after all, but its not a neural network that can make some "assumptions". It is merely a stochastic model of the speech patters.
 
 #### Gibberish
-Generates gibberish from either the previous message or the text you give it. 
 
-Example: 
-```
-$gibberish a big brown fox jumps off the cliff.
-```
-> the ox fox ox big the clig ff.
+It either takes the previous message or the text you give it and turns it into nonsense. 
 
-#### Reproduce
-Reproduces more or less coherent text. More on that in the markov section.
+Example: `$gibberish the big brown fox jumps over the lazy dog` 
+returns
+`ig fox br br the jumps the the ox big down the jumps dog ther jumps big the fown jumps down big br lazy the brown lazy dove big ove dove brox the the the fox fox dove big big do`
+(Actual result. Note that this too is random, another result simply said `he b` 
 
 #### Scatterbrain
 
-Takes no argument. It looks at the past 500 messages, learns their contents and starts generating a quick burst of philosophical wisdom.
+Similar to gibberish, but it looks at the past couple of messages and jumbles these up. Note that in order for both gibberish and scatterbrain to be able to grab past messages, the messages need to be cached, in other words, the bot only sees past messages from the point it last went online. It doesnt store anything meaning if the bot stops, the messages are gone and if you try to run either of these commands immediately after starting the bot, the bot simply sends an error.
 
-### ECONOMY
+
+### Economy commands
 
 #### Balance
-Show your or someone elses accounts balance in Atom Coins, the best currency there is. You earn Atom Coin by being active, they are not guild specific.
+
+Works the same as the XP command, use `$balance` to see your own balance, use `$balance <userping>` to see another users balance
+
+#### Give
+
+Send a user money. You can only send up to 75% of your total balance and the money is subtracted from your own account. An inventory system is planned where users can have and trade items either against other items or via a market place or person to person trading, maybe rewards for freqent activity in the form of crates which you can open for an amount of atomcoins, or another reward system. 
+
+
 
 
 ## Markov
 
 In the previous section I mentioned markov. If you know what it is, ok. If you dont, google is your friend.
-I wrote a Node Module for markov based text generation, it's probably not the usual approach, but it works decently fast. You can find it [here](https://github.com/CallMeAtomfried/markov.js), it even works on its own.
+I wrote a Node Module for markov based text generation, it's probably not the usual approach, but it works decently fast*. You can find it [here](https://github.com/CallMeAtomfried/markov.js), it even works on its own.
 Basically what it does is constantly listen for messages. It adds these messages to a database. The messages are fully anonymised and the process which converts the message text into data that the module can use is non-reversible, meaning once there is a bunch of data in the database, it would be near impossible to reverse engineer more than a few words with absolute certainty.
 If you dont believe me, the bot comes preloaded with a bit of pretrained text. Go into `/markovdata/messages.js` and see for yourself. With a bit of effort you may be able to read the text, but that quickly changes once you unleash a bunch of users onto the bot. It should thus not violate TOS, there is however the setting `learn`
 By default it is set to false, meaning you need to actively opt in. 
 The larger the dataset the more interesting and longer the results become. 
+
+* Testing and timing came up with a speed of roughly 50,000 tokens per second on an AMD Ryzen 7 4700U and 4166MHz RAM, times on an i5 9400F were faster.
+  One token is either one word (A string of characters separated by spaces, eg "xnopyt") or one character, depending on whether or not its a word or letter based model.
+  
 
 ## Games
 
@@ -160,23 +219,24 @@ Added the mastermind game.
 
 ## Upcoming features
 
-- Moderation tools: mute, kick, ban, tempban, tickets <High priority> E.T.A. version b_0.3.1
-- Economy: Inventory, Shops, Transferring money, betting <medium priority> E.T.A. version b_0.3.2
-- Fun: daily weekly and monthly guesses. <low priority> E.T.A. version b_0.3.3
-- detailed logs for all kinds of shenanigans you might want to have. <low-ish priority> E.T.A. b_0.4
+- Moderation tools: mute, kick, ban, tempban, tickets <High priority> E.T.A. version 0.5
+- Economy: Inventory, Shops, Transferring money, betting <medium priority> E.T.A. version 0.6
+- Fun: daily weekly and monthly guesses. <low priority> E.T.A. unknown
+- detailed logs for all kinds of shenanigans you might want to have. <low-ish priority> E.T.A. unknown
 
-- Splitting the bot into multiple processes. Right now only I/O is handled separately.
 - Easier customisation E.T.A. b_0.4
 - Update notifier E.T.A. probably never
 
 ## Advanced users
 
-Welcome to the shadowlands. To use this stuff, you have to - and definietly should - go into the source code of the `main.js`. I advise notepad++.
-In line 80, theres an array containing one long number. Replace that number you see there with your own user id. IT MUST BE YOUR OWN! You can also add more, separated with commas, but do not forget this: each user whose ID is listed in this has full control over your bot far beyond just changing the prefix.
+Welcome to the shadowlands. To use this stuff, you have to - and definietly should - go into the source code of the `admin.js`. I advise notepad++.
+In line 9, theres an array called globalAdmins. Replace that number you see there with your own user id. IT MUST BE YOUR OWN! You can also add more, separated with commas, but do not forget this: each user whose ID is listed in this has full control over your bot far beyond just changing the prefix.
 Sadly, you kinda have to. Else `--rollout` doesnt work. If you dont plan on updating the bot via "official" releases, you dont have to. Maybe consider removing ME from the list, or dont, dont really care. It is perfectly possible to add new commands without ever touching the settings.
 Why?
 Well, most superadmin commands are pretty harmless. 
 - `--rollout` simply applies all changes to the guildsettings template to the individual guild setting files. Preexisting settings are not touched.
 - `--blacklist` is a command with which you can prevent guilds from writing to the global markov model regardless of their setting. Simply do `--blacklist [add|remove] [guild_id]`
 - `--systeminfo` gives you broad info about the current condition of the system, CPU speeds, RAM usage. 
-- `--eval` This is where the danger lies.`--eval` allows you to run any node compatible javascript code directly in chat. This feature exists for debugging or more detailed analysis. In the wrong hands however it can do actual damage. Best case scenario if someone with malicious intent gets access to the bot is they just shut it down. In theory however, it is even possible to change the code. Everything you can make node do in 1995 characters is possible with this. Yes, it is a security risk, but it is manageable. Make sure you only add your own accounts and enable 2FA on all of them. 
+- `--restart` restarts the bot
+- `--reload reloads the commands, useful if you want to make changes to the code without downtime. It reads the commands from disk so it wont be instant, but it should not be noticable on a modern drive.` 
+- `--eval` This is where the danger lies.`--eval` allows you to run any node compatible javascript code directly in chat. This feature exists for debugging or more detailed analysis. In the wrong hands however it can do actual damage. Best case scenario if someone with malicious intent gets access to the bot is they just shut it down. In theory however, it is even possible to change the code. Everything you can make node do in 1993 characters is possible with this. Yes, it is a security risk, but it is manageable. Make sure you only add your own accounts and enable 2FA on all of them. 

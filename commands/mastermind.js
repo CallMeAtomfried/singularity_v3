@@ -17,7 +17,7 @@ module.exports = {
 			"fields": [
 			  {
 				"name": "Starting the game",
-				"value": "Start the game by typing >mm"
+				"value": "Start the game using the mastermind command."
 			  },
 			  {
 				"name": "Making a guess",

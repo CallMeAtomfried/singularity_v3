@@ -31,7 +31,7 @@ module.exports = {
 								"channel": message.channel.id
 							}
 						}
-						console.log(messageData)
+						// console.log(messageData)
 						process.send(messageData)
 						return
 					}

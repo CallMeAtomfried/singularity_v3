@@ -23,10 +23,10 @@ module.exports = {
 								process.send({
 									target: "user",
 									action: "command", 
+									command: "setxp", 
 									data: {
-										"command": "setxp", 
-										"user": args[1], 
-										"amount": parseInt(args[3])
+										user: args[1], 
+										amount: parseInt(args[3])
 									}
 								});
 								break;
@@ -34,10 +34,10 @@ module.exports = {
 								process.send({
 									target: "user",
 									action: "command", 
-									"command": "setbalance", 
+									command: "setbalance", 
 									data: {
-										"user": args[1],
-										"amount": args[3]
+										user: args[1],
+										amount: args[3]
 									}
 								});
 								break;

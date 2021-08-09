@@ -10,7 +10,7 @@ function idToChannel(channelId) {
 module.exports = {
   name: "response",
   description: "Change the chance of the bot to respond on a per channel basis",
-  help: "Usage: <pre>response <Channel ID / Mention> <value>",
+  help: "Usage: <pre>response <Channel Mention> <value>",
   category: "Admin",
   execute(message, args, client) {
 	  // console.log("guild", message.guild.id)

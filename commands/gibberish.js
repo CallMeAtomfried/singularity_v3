@@ -11,20 +11,29 @@ module.exports = {
 		if(!textIn) {
 			var msgs = message.channel.messages.cache.array();
 			var msg = msgs[msgs.length-2]
-			console.log(msg.content);
 			if(msg.content) {
-				gib.learn(msg.content, 1);
-				message.channel.send(gib.reproduce(Math.floor(Math.random()*200), 1));
+				if (msg.content.length < 75) {
+					gib.learn(`${msg.content} ${msg.content}`, 1);
+					message.channel.send(gib.reproduce(Math.floor(Math.random()*200), 1));
+				} else {
+					gib.learn(`${msg.content} ${msg.content}`, 2);
+					message.channel.send(gib.reproduce(Math.floor(Math.random()*200), 2));
+				}
 				gib.reset();
 			} else {
 				message.channel.send("ERROR!");
 			}
 		} else {
-			gib.learn(textIn, 1);
-			message.channel.send(gib.reproduce(Math.floor(Math.random()*200), 1));
+			if (textIn.length < 75) {
+				gib.learn(textIn, 1);
+				message.channel.send(gib.reproduce(Math.floor(Math.random()*200), 1));
+			} else {
+				gib.learn(textIn, 2);
+				message.channel.send(gib.reproduce(Math.floor(Math.random()*200), 2));
+			}
 			gib.reset();
 		}
 		
 	}
-	
+	// 
 }

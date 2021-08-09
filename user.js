@@ -52,6 +52,15 @@ process.on('message', (m) => {
 			case "givemoney":
 				transferMoney(m);
 				break;
+			case "dailyguess":
+				dailyguess(m);
+				break;
+			case "weeklyguess":
+				weeklyguess(m);
+				break;
+			case "monthlyguess":
+				monthlyguess(m);
+				break;
 		}
 	}
 	
@@ -294,5 +303,224 @@ function getBalance(message) {
 	}
 }
 
+
+function dailyguess(message) {
+	console.log("dailyguess")
+	if (message.data.guess < 0 || message.data.guess > 100) {
+		console.log("invalid guess")
+		client.channels.cache.get(message.data.channel).send({
+		   "embed": {
+			"title": "Missing argument",
+			"description": "You must provide a number between 0 and 100 inclusive",
+			"color": 3869547,
+			"author": {
+			  "name": "Ohno :c",
+			  "url": "https://discordapp.com",
+			  "icon_url": "https://images-ext-1.discordapp.net/external/aPMYC_AVv_dI-VO11_P4AyeO4chC4_bnzVZckRXfYBk/%3Fsize%3D1024/https/images.discordapp.net/avatars/601089040107831331/55b54009409e363d8fa0cbd5db36f6a9.png?width=676&height=676"
+			}
+		  }
+		});
+		return;
+	}
+	if (userdb[message.data.user].lastdaily == undefined) userdb[message.data.user].lastdaily = 0;
+	
+	if (userdb[message.data.user].lastdaily < (Date.now() - 86400000)) {
+		userdb[message.data.user].lastdaily = Date.now();
+		var randGuess = Math.floor(Math.random() * 101)
+		if (message.data.guess == randGuess) {
+			 client.channels.cache.get(message.data.channel).send({
+			   "embed": {
+				"title": "Correct guess",
+				"description": "You win 500 ₳",
+				"color": 3869547,
+				"author": {
+				  "name": "Wahoo!",
+				  "url": "https://discordapp.com",
+				  "icon_url": "https://images-ext-1.discordapp.net/external/aPMYC_AVv_dI-VO11_P4AyeO4chC4_bnzVZckRXfYBk/%3Fsize%3D1024/https/images.discordapp.net/avatars/601089040107831331/55b54009409e363d8fa0cbd5db36f6a9.png?width=676&height=676"
+				}
+			  }
+			});
+			userdb[message.data.user].balance += 50000;
+		} else {
+			client.channels.cache.get(message.data.channel).send({
+			   "embed": {
+				"title": "Wrong!",
+				"description": `The correct number was ${randGuess}. Try again in 24 hours!\nYou still get 10 ₳`,
+				"color": 3869547,
+				"author": {
+				  "name": "Ohno :c",
+				  "url": "https://discordapp.com",
+				  "icon_url": "https://images-ext-1.discordapp.net/external/aPMYC_AVv_dI-VO11_P4AyeO4chC4_bnzVZckRXfYBk/%3Fsize%3D1024/https/images.discordapp.net/avatars/601089040107831331/55b54009409e363d8fa0cbd5db36f6a9.png?width=676&height=676"
+				}
+			  }
+			});
+			userdb[message.data.user].balance += 1000;
+		}
+	} else {
+		var current = Date.now();
+		var nextGuess = userdb[message.data.user].lastdaily + 86400000;
+		var diffInMinutes = (nextGuess - current) / 60000;
+		var diffHours = Math.floor(diffInMinutes / 60);
+		var diffMinutes = Math.round(diffInMinutes % 60)
+		client.channels.cache.get(message.data.channel).send({
+		   "embed": {
+			"title": "You have already guessed in the last 24 hours!",
+			"description": `You can guess again in ${diffHours}h ${diffMinutes}m`,
+			"color": 3869547,
+			"author": {
+			  "name": "Ohno :c",
+			  "url": "https://discordapp.com",
+			  "icon_url": "https://images-ext-1.discordapp.net/external/aPMYC_AVv_dI-VO11_P4AyeO4chC4_bnzVZckRXfYBk/%3Fsize%3D1024/https/images.discordapp.net/avatars/601089040107831331/55b54009409e363d8fa0cbd5db36f6a9.png?width=676&height=676"
+			}
+		  }
+		});
+	}		
+}
+
+
+function weeklyguess(message) {
+	if (message.data.guess < 0 || message.data.guess > 100) {
+		client.channels.cache.get(message.data.channel).send({
+		   "embed": {
+			"title": "Missing argument",
+			"description": "You must provide a number between 0 and 100 inclusive",
+			"color": 3869547,
+			"author": {
+			  "name": "Ohno :c",
+			  "url": "https://discordapp.com",
+			  "icon_url": "https://images-ext-1.discordapp.net/external/aPMYC_AVv_dI-VO11_P4AyeO4chC4_bnzVZckRXfYBk/%3Fsize%3D1024/https/images.discordapp.net/avatars/601089040107831331/55b54009409e363d8fa0cbd5db36f6a9.png?width=676&height=676"
+			}
+		  }
+		});
+		return;
+	}
+	if (userdb[message.data.user].lastweekly == undefined) userdb[message.data.user].lastweekly = 0;
+	
+	if (userdb[message.data.user].lastweekly < (Date.now() - (7 * 86400000))) {
+		userdb[message.data.user].lastweekly = Date.now();
+		var randGuess =  Math.floor(Math.random() * 101)
+		if (message.data.guess == randGuess) {
+			 client.channels.cache.get(message.data.channel).send({
+			   "embed": {
+				"title": "Correct guess",
+				"description": "You win 5000 ₳",
+				"color": 3869547,
+				"author": {
+				  "name": "Wahoo!",
+				  "url": "https://discordapp.com",
+				  "icon_url": "https://images-ext-1.discordapp.net/external/aPMYC_AVv_dI-VO11_P4AyeO4chC4_bnzVZckRXfYBk/%3Fsize%3D1024/https/images.discordapp.net/avatars/601089040107831331/55b54009409e363d8fa0cbd5db36f6a9.png?width=676&height=676"
+				}
+			  }
+			});
+			userdb[message.data.user].balance += 500000;
+		} else {
+			client.channels.cache.get(message.data.channel).send({
+			   "embed": {
+				"title": "Wrong!",
+				"description": `The correct number was ${randGuess}. Try again next week!\nYou still get 10 ₳`,
+				"color": 3869547,
+				"author": {
+				  "name": "Ohno :c",
+				  "url": "https://discordapp.com",
+				  "icon_url": "https://images-ext-1.discordapp.net/external/aPMYC_AVv_dI-VO11_P4AyeO4chC4_bnzVZckRXfYBk/%3Fsize%3D1024/https/images.discordapp.net/avatars/601089040107831331/55b54009409e363d8fa0cbd5db36f6a9.png?width=676&height=676"
+				}
+			  }
+			});
+			userdb[message.data.user].balance += 1000;
+		}
+	} else {
+		var current = Date.now();
+		var nextGuess = userdb[message.data.user].lastweekly + (7 * 86400000);
+		var diffInMinutes = (nextGuess - current) / 60000;
+		var diffDays = Math.floor(diffInMinutes / 60 / 24)
+		var diffHours = Math.floor(diffInMinutes / 60) % 24;
+		var diffMinutes = Math.round(diffInMinutes % 60)
+		client.channels.cache.get(message.data.channel).send({
+		   "embed": {
+			"title": "You have already guessed in the last 7 days!",
+		    "description": `You can guess again in ${diffDays}d ${diffHours}h ${diffMinutes}m`,
+			"color": 3869547,
+			"author": {
+			  "name": "Ohno :c",
+			  "url": "https://discordapp.com",
+			  "icon_url": "https://images-ext-1.discordapp.net/external/aPMYC_AVv_dI-VO11_P4AyeO4chC4_bnzVZckRXfYBk/%3Fsize%3D1024/https/images.discordapp.net/avatars/601089040107831331/55b54009409e363d8fa0cbd5db36f6a9.png?width=676&height=676"
+			}
+		  }
+		});
+	}		
+}
+
+
+function monthlyguess(message) {
+	if (message.data.guess < 0 || message.data.guess > 100) {
+		client.channels.cache.get(message.data.channel).send({
+		   "embed": {
+			"title": "Missing argument",
+			"description": "You must provide a number between 0 and 100 inclusive",
+			"color": 3869547,
+			"author": {
+			  "name": "Ohno :c",
+			  "url": "https://discordapp.com",
+			  "icon_url": "https://images-ext-1.discordapp.net/external/aPMYC_AVv_dI-VO11_P4AyeO4chC4_bnzVZckRXfYBk/%3Fsize%3D1024/https/images.discordapp.net/avatars/601089040107831331/55b54009409e363d8fa0cbd5db36f6a9.png?width=676&height=676"
+			}
+		  }
+		});
+		return;
+	}
+	if (userdb[message.data.user].lastmonthly == undefined) userdb[message.data.user].lastmonthly = 0;
+	
+	if (userdb[message.data.user].lastmonthly < (Date.now() - (30 * 7 * 86400000))) {
+		userdb[message.data.user].lastmonthly = Date.now();
+		var randGuess =  Math.floor(Math.random() * 101)
+		if (message.data.guess == randGuess) {
+			 client.channels.cache.get(message.data.channel).send({
+			   "embed": {
+				"title": "Correct guess",
+				"description": "You win 50000 ₳",
+				"color": 3869547,
+				"author": {
+				  "name": "Wahoo!",
+				  "url": "https://discordapp.com",
+				  "icon_url": "https://images-ext-1.discordapp.net/external/aPMYC_AVv_dI-VO11_P4AyeO4chC4_bnzVZckRXfYBk/%3Fsize%3D1024/https/images.discordapp.net/avatars/601089040107831331/55b54009409e363d8fa0cbd5db36f6a9.png?width=676&height=676"
+				}
+			  }
+			});
+			userdb[message.data.user].balance += 5000000;
+		} else {
+			client.channels.cache.get(message.data.channel).send({
+			   "embed": {
+				"title": "Wrong!",
+				"description": `The correct number was ${randGuess}. Try again next week!\nYou still get 10 ₳`,
+				"color": 3869547,
+				"author": {
+				  "name": "Ohno :c",
+				  "url": "https://discordapp.com",
+				  "icon_url": "https://images-ext-1.discordapp.net/external/aPMYC_AVv_dI-VO11_P4AyeO4chC4_bnzVZckRXfYBk/%3Fsize%3D1024/https/images.discordapp.net/avatars/601089040107831331/55b54009409e363d8fa0cbd5db36f6a9.png?width=676&height=676"
+				}
+			  }
+			});
+			userdb[message.data.user].balance += 1000;
+		}
+	} else {
+		var current = Date.now();
+		var nextGuess = userdb[message.data.user].lastmonthly + (30 * 7 * 86400000);
+		var diffInMinutes = (nextGuess - current) / 60000;
+		var diffDays = Math.floor(diffInMinutes / 60 / 24)
+		var diffHours = Math.floor(diffInMinutes / 60) % 24;
+		var diffMinutes = Math.round(diffInMinutes % 60)
+		client.channels.cache.get(message.data.channel).send({
+		   "embed": {
+			"title": "You have already guessed in the last 30 days!",
+		    "description": `You can guess again in ${diffDays}d ${diffHours}h ${diffMinutes}m`,
+			"color": 3869547,
+			"author": {
+			  "name": "Ohno :c",
+			  "url": "https://discordapp.com",
+			  "icon_url": "https://images-ext-1.discordapp.net/external/aPMYC_AVv_dI-VO11_P4AyeO4chC4_bnzVZckRXfYBk/%3Fsize%3D1024/https/images.discordapp.net/avatars/601089040107831331/55b54009409e363d8fa0cbd5db36f6a9.png?width=676&height=676"
+			}
+		  }
+		});
+	}		
+}
 
 client.login(config.token);

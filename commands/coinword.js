@@ -12,6 +12,10 @@ module.exports = {
 				seeds[i-1] = args[i]
 			}
 		}
+		if (seeds.length > 20) {
+			message.channel.send("Too many seeds");
+			return
+		}
 		if (message.channel.type == "dm") {
 			process.send({target: "markov", action: "command", "command":"coinword", data: {"array":seeds, "channel": message.author.id, dm: true}});
 		} else {

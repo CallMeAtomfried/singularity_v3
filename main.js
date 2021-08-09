@@ -114,15 +114,15 @@ client.on("message", (message) => {
 			
 			
 			if (!message.content.startsWith(messageGuild.settings.settings.prefix) && !message.content.startsWith("--")) {
-				process.send({
-					target: "user", 
-					action: "command", 
-					"command": "addxp", 
-					data: {
-						"user": message.author.id, 
-						"amt": 1
-					}
-				})
+				// process.send({
+					// target: "user", 
+					// action: "command", 
+					// "command": "addxp", 
+					// data: {
+						// "user": message.author.id, 
+						// "amt": 1
+					// }
+				// })
 				process.send({
 					target: "user", 
 					action: "command", 

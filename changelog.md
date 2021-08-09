@@ -6,6 +6,8 @@
 	- Some functionality is disabled in DMs for a number of reasons
 	- The bot will always respond to DMs and turning it off is not possible. If you dont want it to respond, using it via DMs is not obligatory.
 	- DM responses use a new way of determining how to respond. Instead of ALWAYS using a random word from the message as seed, the chance of the bot doing so increases with longer messages, at 10 words or more it will always use a random word.
+#### 0.4.2b
+Bug where restarting the bot doesnt restart the bot but simply starts up a second instance of the bot has been fixed.
 
 ### 0.4.1 - Current version (19.07.2021)
 - Bugfixes

@@ -36,7 +36,7 @@ function tick() {
 		shutdownProcess(user)
 		user = startProcess("./user.js")
 	}
-	if (markov.heartbeat > 20) {
+	if (admin.heartbeat > 20) {
 		console.log("Admin Timeout");
 		shutdownProcess(admin)
 		admin = startProcess("./admin.js")
@@ -54,6 +54,7 @@ function shutdownProcess(proc) {
 }
 
 function startProcess(procName) {
+	
 	return {process: child.fork(procName), invoked: false, heartbeat: 0, check: false};
 }
 

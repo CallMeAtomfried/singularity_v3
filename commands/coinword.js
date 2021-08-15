@@ -16,11 +16,15 @@ module.exports = {
 			message.channel.send("Too many seeds");
 			return
 		}
+		
 		if (message.channel.type == "dm") {
-			process.send({target: "markov", action: "command", "command":"coinword", data: {"array":seeds, "channel": message.author.id, dm: true}});
+			var channel = message.author.id
 		} else {
-			process.send({target: "markov", action: "command", "command":"coinword", data: {"array":seeds, "channel": message.channel.id}});
+			var channel = message.channel.id
 		}
+		
+		process.send({target: "markov", action: "command", "command":"coinword", data: {"array":seeds, "channel":channel, dm: message.channel.type == "dm"}});
+		
 	}
 	
 }

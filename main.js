@@ -100,6 +100,7 @@ client.on("message", (message) => {
 			}
 			
 			if(message.content.startsWith(`${messageGuild.settings.settings.prefix}help`)) {
+				console.log("command received");
 				commandHandler.help(message, guilds[message.guild.id]);
 			// } else if (message.content.startsWith(guilds[message.guild.id].settings.settings.prefix + "reproduce")) {
 				// commandHandler.handler(message, guilds[message.guild.id], markov);
@@ -123,15 +124,15 @@ client.on("message", (message) => {
 						// "amt": 1
 					// }
 				// })
-				process.send({
-					target: "user", 
-					action: "command", 
-					"command": "addmsgstat", 
-					data: {
-						"user": message.author.id, 
-						guild: message.guild.id
-					}
-				})
+				// process.send({
+					// target: "user", 
+					// action: "command", 
+					// "command": "addmsgstat", 
+					// data: {
+						// "user": message.author.id, 
+						// guild: message.guild.id
+					// }
+				// })
 				
 				// console.log(messageGuild.settings.settings);
 				var rand = Math.random()

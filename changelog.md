@@ -2,6 +2,9 @@
 - More bugfixes
 - Added Daily, Weekly and Monthly guesses with a chance to win Atomcoin
 
+0.4.3b
+- Bugfix related to coinword
+
 ### 0.4.2 - (09.08.2021)
 - Bugfixes
 - Renamed "Reproduce" to "generate"

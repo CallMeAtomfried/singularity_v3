@@ -11,9 +11,16 @@
 		"role_permissions": "((WIP))",
 		"prefix": "String",
 		"automod": "Use command automod",
+		"random_chance": "Float",
+		"response_chance": {
+			"Channel ID": "Float"
+		},
 		"warn_expiry": "Integer",
 		"warns_for_strike": "Integer",
-		"strikes_for_kick": "Integer"
+		"strike_expiry": "Integer",
+		"strikes_for_kick": "Integer",
+		"strikes_for_ban": "Integer",
+		"kicks_for_ban": "Integer"
 	},
 	"settings": {
 		"learn": false,
@@ -28,9 +35,14 @@
 		},
 		"prefix":"$",
 		"automod":[],
+		"random_chance": 0.3,
+		"response_chance": {},
 		"warn_expiry": 0,
 		"warns_for_strike": 0,
-		"strikes_for_kick": 0
+		"strike_expiry": 0,
+		"strikes_for_kick": 0,
+		"strikes_for_ban": 0,
+		"kicks_for_ban": 0
 	},
 	"commands":{
 		"_admin":{

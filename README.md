@@ -1,6 +1,6 @@
 # Singularity Bot
 
-Current version: 0.4.3b
+Current version: 0.4.3c
 
 The hopefully last rewrite of the bot that went nowhere. Not to be taken seriously this is mainly for me to see whats possible. Of course you can go ahead and host it yourself, all you need is a Discord token.
 Its fully functional in theory, so far it has not been hit with a significant load yet.
@@ -104,6 +104,9 @@ The aforementioned command to set the chances to respond to a message on a per c
 
 Usage: `$response <Channel Mention> <value>`
 Where Channel Mention is simply the name of the Channel with a # in front of it, discord should automatically convert it into the right format, and the value is a floating point number between 0.0 and 1.0 inclusive. This will be the chance of the bot responding, meaning on average for every 100 messages it will respond to chance * 100 of them. For example, if the chance is set to 0.2, it will respond to 20 out of 100 (or 1 out of 5) messages, on average. Note that it will not respond to every fifth message in this case. It is still random. It might respond to several messages in a row, it might not respond for an entire day, thats just randomness. Exceptions are of course 0.0, where it will not respond at all, and 1.0, where it will respond every time. 
+
+`$response <Channel Mention>` returns the current chance the bot will respond in that channel. 
+`$response all` lists all chances for all channels that are not 0. 
 
 #### User
 
@@ -226,6 +229,20 @@ Added the mastermind game.
 
 - Easier customisation E.T.A. b_0.4
 - Update notifier E.T.A. probably never
+  
+- Connect Four game
+
+- Restructuring of the bot to make it fully modular. The modules will be analogous to the different "sub-bots" that Singularity already consists of, meaning "Main", "Markov", "Game", "Admin", "User". See below.
+  
+## Modularity
+  
+!!! NOT YET IMPLEMENTED !!!
+  
+It is planned that the bot will allow you to install commands on the fly and only those you actually want or need. That much is already possible, even without restarting the bot. What changes is the introduction of "modules" which handle different tasks. These function pretty similarly to actual node modules in that they are an addon like part of the bot that will be fully integrated into the bot should you choose to use them. Commands will then have dependencies, naturally commands need certain modules for their functionality. You cannot have a balance or XP without the user module. It is not planned to make the dependencies any more granular as that would just not be feasible, its clunky and takes up resources. Thus, the modules will at the start be the familiar modules handling games, admin functionality, basic interaction (main), user functionality, markov related functionality as wekk as an upcoming logger for diagnostics. 
+  
+Note however that while some modules can be omitted, some are not really modules as they are required for the bot to be functional. For example the "main" module handles command parsing and thus it would be impossible to interact with the bot. The admin module is also highly advised. But those two alone hardly make a functioning bot, you can make your own commands that just reply with not much going on, but the beauty is you can then just choose additional functionality you want your bot to have. Commands that require a specific module to function will not work without, naturally. The according modules will NOT be installed automatically. 
+  
+  To recap: for a functioning bot you need the main and admin modules. The admin module isnt strictly necessary, but the bot would be limited to managing tickets and other basic functionality. A list of dependencies for commands can be found in the `dependencies.md`
 
 ## Advanced users
 

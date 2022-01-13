@@ -5,7 +5,11 @@ const client = new Discord.Client();
 const config = require("./config.json");
 var globalAdmins = ["354275704457789451", "586547885320175629"]
 var userdb = JSON.parse(fs.readFileSync("./data/users.json").toString())
+
+var mute = require("./data/mutes.json")
+
 setInterval(function(){tick()}, 4000);
+// setInterval(checkMutes(), 1000)
 // setInterval(function(){save()}, 10000);
 // console.log(process);
 function save() {
@@ -61,12 +65,46 @@ process.on('message', (m) => {
 			case "monthlyguess":
 				monthlyguess(m);
 				break;
+			case "mute":
+				mute(m)
+				break
+			case "warn":
+			
+				break
+			case "strike":
+				
+				break
 		}
 	}
 	
 });
 
-
+function mute(m) {
+	var guild = require(`./guilds/${m.data.guild}/settings.json`)
+	
+	var timeStart = Date.now();
+	var timeEnd = Date.now() + m.data.duration;
+	
+	guild.mutes[m.data.user.id] = {
+		timestampStart: timeStart,
+		timestampEnd: timeEnd,
+		duration: m.data.duration,
+		reason: m.data.reason
+	}
+	client.channels.cache.get(m.data.channel).send({
+		"embed": {
+			"title": `Muted user ${m.data.user.username}#${m.data.user.discriminator} for ${m.data.timestring}.`,
+			"description": `Reason: ${m.data.reason}`,
+			"color": 5904774,
+			"author": {
+				"name": "Success"
+			}
+			}
+	})
+	fs.writeFile(`./guilds/${m.data.guild}/settings.json`, JSON.stringify(guild), function(){console.log("done")})
+	setTimeout(removeMute(m.data.user.id, m.data.guild), duration);
+	// Logging  stuff
+}
 
 function transferMoney(message) {
 	if (globalAdmins.includes(message.data.sender.id)) {
@@ -469,7 +507,7 @@ function monthlyguess(message) {
 	}
 	if (userdb[message.data.user].lastmonthly == undefined) userdb[message.data.user].lastmonthly = 0;
 	
-	if (userdb[message.data.user].lastmonthly < (Date.now() - (30 * 7 * 86400000))) {
+	if (userdb[message.data.user].lastmonthly < (Date.now() - (30 * 86400000))) {
 		userdb[message.data.user].lastmonthly = Date.now();
 		var randGuess =  Math.floor(Math.random() * 101)
 		if (message.data.guess == randGuess) {
@@ -490,7 +528,7 @@ function monthlyguess(message) {
 			client.channels.cache.get(message.data.channel).send({
 			   "embed": {
 				"title": "Wrong!",
-				"description": `The correct number was ${randGuess}. Try again next week!\nYou still get 10 ₳`,
+				"description": `The correct number was ${randGuess}. Try again next month!\nYou still get 10 ₳`,
 				"color": 3869547,
 				"author": {
 				  "name": "Ohno :c",
@@ -503,7 +541,7 @@ function monthlyguess(message) {
 		}
 	} else {
 		var current = Date.now();
-		var nextGuess = userdb[message.data.user].lastmonthly + (30 * 7 * 86400000);
+		var nextGuess = userdb[message.data.user].lastmonthly + (30 * 86400000);
 		var diffInMinutes = (nextGuess - current) / 60000;
 		var diffDays = Math.floor(diffInMinutes / 60 / 24)
 		var diffHours = Math.floor(diffInMinutes / 60) % 24;

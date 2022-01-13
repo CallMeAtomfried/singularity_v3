@@ -40,38 +40,44 @@ process.on('message', (m) => {
 			break;
 		case "retrieve":
 			break
+		case "mastermind":
+			initPlayer(m);
+			break
 		}
 	}
 });
 
 function deleteGame(game) {
-	mastermindplayers[message.author.id] = null;
+	mastermindplayers[game] = null;
 }
 
 client.on("message", (message) => {
-	var check = "";
-	if (message.channel.type == "dm") {
-		check = "$mastermind";
-	} else {
-		check = `${guilds[message.guild.id].settings.settings.prefix}mastermind`
-	}
-		
-		
-	if(message.content == check) {
-		
-		// console.log("game");
-		let Game = require("./util/game.js");
-		if (message.channel.type == "dm") {
-			let game = new Game(message.author.id, 1, message);
-			mastermindplayers[message.author.id] = [message.author.id, game, Date.now()]
-			setTimeout(deleteGame, 600000, message.author.id);
-		} else {
-			let game = new Game(message.author.id, 1, message);
-			mastermindplayers[message.author.id] = [message.channel.id, game, Date.now()]
-			setTimeout(deleteGame(message.author.id), 600000, message.channel.id);
-		}
+	if (mastermindplayers[message.author.id]) {
+		mastermind(message);
 	}
 	
+	
+	
+})
+
+function initPlayer(m) {
+	var players = Object.keys(mastermindplayers)
+	
+	if (!mastermindplayers[m.message.authorID]) {
+		let Game = require("./util/game.js");
+		if (m.idDm) {
+			let game = new Game(m.message.authorID, 1,  m.isDm);
+			mastermindplayers[m.message.authorID] = [m.message.authorID, game, Date.now()]
+			setTimeout(function() {deleteGame(m.message.authorID)}, 600000);
+		} else {
+			let game = new Game(m.message.authorID, 1,  m.isDm);
+			mastermindplayers[m.message.authorID] = [m.message.channelID, game, Date.now()]
+			setTimeout(function() {deleteGame(m.message.authorID)}, 600000);
+		}
+	}
+}
+
+function mastermind(message) {
 	
 	if(mastermindplayers[message.author.id]&&!message.content.includes("rules")) {
 		
@@ -94,7 +100,7 @@ client.on("message", (message) => {
 		}
 	}
 	
-})
+}
 
 
 client.login(config.token);

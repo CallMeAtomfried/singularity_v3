@@ -1,6 +1,6 @@
 // Markov process
 process.send({target: "watchdog", action: "return", "return": "starting"})
-const Markov = require("ooer-markov");
+const Markov = require("./util/markov.js");
 const Discord = require("discord.js");
 const client = new Discord.Client();
 const config = require("./config.json");
@@ -13,6 +13,7 @@ var coinword = new Markov();
 
 markov.load("./markovdata/words.json");
 coinword.load("./markovdata/english.json");
+
 const englishWords = fs.readFileSync("./markovdata/english.txt").toString().split("\r\n");
 
 setInterval(function(){tick()}, 10000);
@@ -34,7 +35,7 @@ function tick() {
 function coin(m) {
 	var out = "";
 	for (var w in m.data.array) {
-		if(m.data.array[w] == "\n") m.data.array[w] = null;
+		// if(m.data.array[w] == "\n") m.data.array[w] = null;
 		var add = "";
 		while(englishWords.includes(add) || add.length < 3 || add == m.data.array[w]) {
 			add = (coinword.reproduce(100, 3, m.data.array[w], "\n").replace(/\n/g, ""))
@@ -77,11 +78,11 @@ client.on("message", (message) => {
 		var guild = new Guild(message.guild.id);
 		guild.loadSettings();
 		if (message.mentions.has(client.user)) {
-			message.channel.send(stringify(markov.reproduce(Math.floor(Math.random() * 500), 2)));
+			message.channel.send(stringify(markov.reproduce(Math.floor(Math.random() * 500), 3)));
 		}
 		
-		if (guild.settings.settings.learn && message.author.id != client.user.id && !message.content.startsWith(guild.settings.settings.prefix) && !message.content.startsWith("--")) {
-			// markov.learn(message.content.split(" "), 3);
+		if (guild.settings.settings.learn && message.author.id != client.user.id && !message.content.startsWith(guild.settings.settings.prefix) && !message.content.startsWith("--") && !config.blacklistguilds.includes(message.guild.id)) {
+			markov.learn(message.content.split(" "), 3);
 			markov.learn(message.content.split(" "), 2);
 			markov.learn(message.content.split(" "), 1);
 			process.send({target: "watchdog", action: "return", "return": "learned"});
@@ -105,7 +106,7 @@ process.on('message', (m) => {
 				break;
 			case "reproduce":
 				if (m.data.dm) { 
-					client.users.cache.get(m.data.channel).send(stringify(markov.reproduce(Math.floor(Math.random() * 500), 2, m.data.text.substring(10))));
+					client.users.cache.get(m.data.channel).send(stringify(markov.reproduce(Math.floor( 1000), 2, m.data.text.substring(10))));
 				} else {
 					var guild = new Guild(m.guild);
 					guild.loadSettings();
@@ -114,11 +115,13 @@ process.on('message', (m) => {
 				}
 				break;
 			case "randommessage":
+			var t1 = Date.now()
 				var wordarray = m.data.text.split(" ");
 				// console.log("array", wordarray);
 				var randWord = wordarray[Math.floor(Math.random() * wordarray.length)];
 				// console.log("randword:", randWord);
 				client.channels.cache.get(m.data.channel).send(stringify(markov.reproduce(Math.floor(Math.random() * 500), 2, randWord)));
+				console.log(Date.now() - t1, "ms");
 				break
 			case "userdm":
 				userdm(m);

@@ -77,15 +77,18 @@ function start() {
 	});
 
 	markovprocess.process.on('message', function (message) {
-		if (message.return != "heartbeat") console.log("markov:".padEnd(10), message);
-		switch(message.return) {
-			case "heartbeat": 
-				heartbeats.markov = 0;
-				break
-			case "online":
-				// console.log("markov:", message);
-				checkheartbeats.markov = true;
-				break;
+		if (message.target != "watchdog") {
+			messagehandle(message);
+			console.log("markov:".padEnd(10), message)
+		} else {
+			switch(message.action) {
+				case "heartbeat":
+					heartbeats.main = 0;
+					break;
+				case "return":
+					console.log("markov:".padEnd(10), message)
+					break;
+			}
 		}
 	});
 
@@ -104,26 +107,23 @@ function start() {
 	});
 
 	adminprocess.process.on('message', function (message) {
-		if (message.return != "heartbeat") console.log("admin:".padEnd(10), message);
-		switch(message.command) {
-			case "restart":
-				restart();
-				break;
-			case "reload":
-				mainprocess.process.send({"command": "reload"});
-				break;
-		}
-		
-		switch(message.return) {
-			case "heartbeat": 
-				heartbeats.admin = 0;
-				break
-			case "online":
-				checkheartbeats.admin = true;
-				break;
+		if (message.target != "watchdog") {
+			messagehandle(message);
+			console.log("admin:".padEnd(10), message)
+		} else {
+			switch(message.action) {
+				case "heartbeat":
+					heartbeats.main = 0;
+					break;
+				case "return":
+					console.log("admin:".padEnd(10), message)
+					break;
+			}
 		}
 		
 	});
+	
+	
 	adminprocess.process.on('exit', function (code) {
 		if (adminprocess.invoked) return;
 		invoked = true;
@@ -141,24 +141,25 @@ function start() {
 		gameprocess.invoked = true;
 		callback(err);
 	});
+	
+	
 	gameprocess.process.on('message', function (message) {
-		if (message.return != "heartbeat") console.log("game:".padEnd(10), message);
-		switch(message.command) {
-			case "addbalance":
-			case "addxp":
-			case "addmsgstat":
-				userprocess.process.send(message);
-				break
-		}
-		switch(message.return) {
-			case "heartbeat": 
-				heartbeats.game = 0;
-				break
-			case "online":
-				checkheartbeats.game = true;
-				break;
+		if (message.target != "watchdog") {
+			messagehandle(message);
+			console.log("game:".padEnd(10), message)
+		} else {
+			switch(message.action) {
+				case "heartbeat":
+					heartbeats.main = 0;
+					break;
+				case "return":
+					console.log("game:".padEnd(10), message)
+					break;
+			}
 		}
 	});
+	
+	
 	gameprocess.process.on('exit', function (code) {
 		if (gameprocess.invoked) return;
 		invoked = true;
@@ -172,42 +173,24 @@ function start() {
 		mainprocess.invoked = true;
 		callback(err);
 	});
+	
 	mainprocess.process.on('message', function (message) {
-		if (message.return != "heartbeat") console.log("main:".padEnd(10), message);
-		switch(message.command) {	
-			case "addbalance":
-			case "setbalance":
-			case "getbalance":
-			case "addxp":
-			case "setxp":
-			case "getxp":
-			case "addmsgstat":
-			case "givemoney":
-				userprocess.process.send(message);
-				break
-				
-			case "mute":
-				// send to mute process
-				break;
-			case "reproduce":
-			case "randommessage":
-			case "coinword":
-				markovprocess.process.send(message);
+		if (message.target != "watchdog") {
+			messagehandle(message);
+			console.log("main:".padEnd(10), message)
+		} else {
+			switch(message.action) {
+				case "heartbeat":
+					heartbeats.main = 0;
+					break;
+				case "return":
+					console.log("main:".padEnd(10), message);
+					break;
+			}
 		}
-		
-		switch(message.return) {
-			case "heartbeat": 
-				heartbeats.main = 0;
-				break
-				
-			case "online":
-				// console.log("main:", message);
-				checkheartbeats.main = true;
-				break;
-		}
-		
-		
 	});
+	
+	
 	mainprocess.process.on('exit', function (code) {
 		if (mainprocess.invoked) return;
 		mainprocess.invoked = true;
@@ -226,20 +209,22 @@ function start() {
 	});
 	
 	userprocess.process.on('message', function (message) {
-		if (message.return != "heartbeat") console.log("user:".padEnd(10), message);
-		// console.log("user:", message);
-		switch(message.return) {
-			case "heartbeat": 
-				heartbeats.user = 0;
-				break
-			case "online":
-				// console.log("user:", message);
-				checkheartbeats.user = true;
-				break;
+		if (message.target != "watchdog") {
+			messagehandle(message);
+			console.log("user:".padEnd(10), message)
+		} else {
+			switch(message.action) {
+				case "heartbeat":
+					heartbeats.main = 0;
+					break;
+				case "return":
+					console.log("user:".padEnd(10), message)
+					break;
+			}
 		}
-		
-		
 	});
+	
+	
 	userprocess.process.on('exit', function (code) {
 		if (userprocess.invoked) return;
 		userprocess.invoked = true;
@@ -248,6 +233,28 @@ function start() {
 	});
 }
 
+
+function messagehandle(message) {
+	switch (message.target) {
+		case "watchdog":
+		case "main":
+			mainprocess.process.send(message);
+			break;
+		case "markov":
+			markovprocess.process.send(message);
+			break;
+		case "game":
+			gameprocess.process.send(message);
+			break;
+		case "user":
+			userprocess.process.send(message);
+			break;
+		case "admin":
+			adminprocess.process.send(message);
+			break;
+	}
+	
+}
 
 
 function restart() {
